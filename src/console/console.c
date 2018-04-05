@@ -9,6 +9,7 @@ static _Device *consolescreen;
 //
 void setscreen(_Device *dev) {
     consolescreen = dev;
+    printf("Screen device id is %08X\n", dev-id);
 }
 
 // Print a char to the specific position on screen
