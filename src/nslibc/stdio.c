@@ -15,7 +15,7 @@ int printf(const char *fmt, ...) {
     //_putc('0' + i);
     //_putc('\n');
     for (j = 0; j < i; j++)
-        _putc(printbuf[j] + '0');
+        _putc(printbuf[j]);
     va_end(args);
     return i;
 }
