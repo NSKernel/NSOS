@@ -66,7 +66,7 @@ void printchar(char ch, int x, int y) {
 }
 
 void refreshscreen() {
-    
+    int i;
     
     cursorx = 0;
     cursory = 0;
