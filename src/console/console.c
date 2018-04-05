@@ -134,7 +134,7 @@ void printchar(char ch) {
         }
     }
     else {
-        printchar(ch, cursorx, cursory);
+        printcharpos(ch, cursorx, cursory);
         screenbuf[(cursory + linestart) % cursorymax][cursorx] = ch;
         if (cursorx == cursorxmax - 1) { // new line
             cursorx = 0;
@@ -159,7 +159,7 @@ void printchar(char ch) {
 void printstring(char *buf) {
     int i;
     while (*buf) {
-        printchar(*buf)
+        printchar(*buf);
         buf++;
     }
 }
