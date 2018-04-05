@@ -122,7 +122,7 @@ void printchar(char ch) {
     int i;
     
     if (ch == '\n') {
-        printchar(*buf, cursorx, cursory);
+        printcharpos(ch, cursorx, cursory);
         cursorx = 0;
         if (cursory == cursorymax - 1) { 
             for (i = 0; i < cursorxmax; i++) {
