@@ -14,7 +14,7 @@ void setscreen(_Device *dev) {
 
 // Print a char to the specific position on screen
 void printchar(char ch, int x, int y) {
-    char selector = 0x80;
+    unsigned char selector = 0x80;
     int i, j;
     // Pixel position is (8 + 1) * x, (16 + 1) * y
     for (j = 0; j < 16; j++) {
