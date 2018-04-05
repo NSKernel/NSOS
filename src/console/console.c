@@ -50,7 +50,7 @@ void printstring(char *buf) {
     while (*buf) {
         if (*buf == '\n') {
             cursorx = 0;
-            if (cursory == cursorymax) {
+            if (cursory == cursorymax - 1) {
                 cursory = 0;
             }
             else {
@@ -59,9 +59,9 @@ void printstring(char *buf) {
         }
         else {
             printchar(*buf, cursorx, cursory);
-            if (cursorx == cursorxmax) { // new line
+            if (cursorx == cursorxmax - 1) { // new line
                 cursorx = 0;
-                if (cursory == cursorymax) {
+                if (cursory == cursorymax - 1) {
                     cursory = 0;
                 }
                 else {
