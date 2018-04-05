@@ -122,6 +122,7 @@ int main() {
                    break;
                  case _KEY_LSHIFT:
                    LShiftDown = 1;
+                   printf("SetLSHIFT");
                    break;
                  case _KEY_RSHIFT:
                    RShiftDown = 1;
