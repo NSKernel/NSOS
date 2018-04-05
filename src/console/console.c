@@ -68,7 +68,7 @@ void refreshscreen() {
     
     cursorx = 0;
     cursory = 0;
-    for (i = 0; i < cursorymax; i++) {
+    for (i = 0; i < cursorymax - 1; i++) {
         printstring(screenbuf[linestart + i]);
     }
 }
@@ -88,6 +88,9 @@ void initconsole(_Device *dev) {
     cursorymax = (info.height - 6) / 17;
     clearscreenbuf();
     refreshscreen();
+    
+    cursorx = 0;
+    cursory = 0;
     
     printf("Screen device id is %08X\n", dev->id);
 }
