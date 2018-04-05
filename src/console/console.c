@@ -75,6 +75,7 @@ void refreshscreen() {
         printstring(screenbuf[(linestart + i) % cursorymax]);
         printf("i  after c = %d", i);
     }
+    printf("ended");
 }
 
 //
