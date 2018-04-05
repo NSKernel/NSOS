@@ -69,6 +69,42 @@ int main() {
            if (KeyboardLastStatus) {
                switch (KeyboardRegister.keycode) {
                  _LETTER_N_NUMS(_WRITE_LNN)
+                 case _KEY_RETURN:
+                   printstring("\n");
+                   break;
+                 case _KEY_MINUS:
+                   printstring("-");
+                   break;
+                 case _KEY_EQUALS:
+                   printstring("=");
+                   break;
+                 case _KEY_TAB:
+                   printstring("    ");
+                   break;
+                 case _KEY_LEFTBRACKET:
+                   printstring("[");
+                   break;
+                 case _KEY_RIGHTBRACKET:
+                   printstring("]");
+                   break;
+                 case _KEY_BACKSLASH:
+                   printstring("\");
+                   break;
+                 case _KEY_SEMICONLON:
+                   printstring(";");
+                   break;
+                 case _KEY_APOSTROPHE:
+                   printstring("\'");
+                   break;
+                 case _KEY_COMMA:
+                   printstring(",");
+                   break;
+                 case _KEY_PERIOD:
+                   printstring(".");
+                   break;
+                 case _KEY_SLASH:
+                   printstring("/");
+                   break;
                }
            }
        }
