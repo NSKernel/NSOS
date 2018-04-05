@@ -5,7 +5,7 @@ extern unsigned char iso_font[256*16];
 static _Device *consolescreen;
 
 //
-void setscreen(_Decive *dev) {
+void setscreen(_Device *dev) {
     consolescreen = dev;
 }
 
