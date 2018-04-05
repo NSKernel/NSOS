@@ -1,4 +1,4 @@
-
+#include <am.h>
 
 extern unsigned char iso_font[256*16];
 
