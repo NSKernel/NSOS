@@ -129,11 +129,11 @@ void printstring(char *buf) {
                 }
                 else {
                     cursory += 1;
+                    printf("cursory = %d\n", cursory);
                 }
             }
             else {
                 cursorx += 1;
-                printf("cursory = %d", cursory);
             }
         }
         buf++;
