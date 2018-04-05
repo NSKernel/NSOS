@@ -141,7 +141,7 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 
     for (str=buf ; *fmt ; ++fmt) {
         if (*fmt != '%') {
-            _putc(*str);
+            //_putc(*str);
             *str++ = *fmt;
             continue;
         }
@@ -256,6 +256,8 @@ int vsprintf(char *buf, const char *fmt, va_list args)
         }
     }
     *str = '\0';
+    _putc(str - buf + '0');
+    _putc('\n');
     return str-buf;
 }
 
