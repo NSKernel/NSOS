@@ -45,12 +45,7 @@ int main() {
   }
   
   initconsole(_device(deviceit));
-  
-  while (count < 60) {
-      sprintf(testbuf, "\nHello the %d times.", count);
-      count += 1;
-      printstring(testbuf); 
-  }
+  printstring("NS/OS 0 Console Test Space\nCopyright (C) 2018 NSKernel. All rights reserved\n\nYou may Type anything and it will show on the screen. Backspace is NOT AVAILABLE.");
   return 0;
 }
 
