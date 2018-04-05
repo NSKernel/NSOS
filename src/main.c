@@ -39,8 +39,11 @@ int main() {
   deviceit = 1;
   while (!_device(deviceit) && _device(deviceit)->id != _DEV_VIDEO)
       deviceit += 1;
+  printf("Found screen.\n");
   setscreen(_device(deviceit));
+  printf("Screen set.\n");
   printchar('T', 0, 0);
+  printf("Printed T.\n");
   printchar('e', 1, 0);
   printchar('s', 2, 0);
   printchar('t', 3, 0);
