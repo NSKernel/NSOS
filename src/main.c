@@ -1,6 +1,7 @@
 #include <am.h>
 #include <amdev.h>
 #include <stdio.h>
+#include <os/console.h>
 
 // TODO: implement necessary libraries
 //int printf(const char *fmt, ...) {
@@ -32,6 +33,11 @@ int main() {
     }
     printf("\n");
   }
+  setscreen(_device(_DEV_VIDEO));
+  printchar('T', 0, 0);
+  printchar('e', 1, 0);
+  printchar('s', 2, 0);
+  printchar('t', 3, 0);
   return 0;
 }
 
