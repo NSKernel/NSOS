@@ -112,7 +112,7 @@ void printstring(char *buf) {
             }
             else {
                 cursory += 1;
-                printf("cursory = %d", cursory);
+                printf("cursory re = %d\n", cursory);
             }
         }
         else {
@@ -129,7 +129,7 @@ void printstring(char *buf) {
                 }
                 else {
                     cursory += 1;
-                    printf("cursory = %d\n", cursory);
+                    printf("cursory rc = %d\n", cursory);
                 }
             }
             else {
