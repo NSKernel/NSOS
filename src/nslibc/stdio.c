@@ -1,5 +1,6 @@
 #include <stdarg.h>
 #include <stdio.h>
+#include <am.h>
 
 static char printbuf[1024];
 
@@ -13,4 +14,5 @@ int printf(const char *fmt, ...) {
     for (j = 0; j < i; j++)
         _putc(printbuf[i]);
     va_end(args);
+    return i;
 }
