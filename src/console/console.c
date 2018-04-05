@@ -11,6 +11,7 @@ static unsigned int cursorx;
 static unsigned int cursory;
 static unsigned int cursorxmax;
 static unsigned int cursorymax;
+static char cursoron;
 
 static char screenbuf[200][200];
 static unsigned char linestart;
@@ -90,7 +91,9 @@ void refreshscreen() {
     cursory = 0;
     for (i = 0; i < cursorymax - 1; i++) {
         for (j = 0; j < cursorxmax; j++) {
-            printchar(screenbuf[(linestart + i) % cursorymax][j], 0);
+            cursoron = 0;
+            printchar(screenbuf[(linestart + i) % cursorymax][j]);
+            cursoron = 1;
         }
         //printstring(screenbuf[(linestart + i) % cursorymax]);
     }
@@ -118,13 +121,32 @@ void initconsole(_Device *dev) {
     
     cursorx = 0;
     cursory = 0;
+    cursoron = 1;
     
     printcursor(0, 0);
     
     printf("Screen device id is %08X\n", dev->id);
 }
 
-void printchar(char ch, char cursoron) {
+void setcursor(unsigned int x, unsigned int y, char on) {
+    cursorx = x;
+    cursory = y;
+    cursoron = on;
+}
+
+unsigned int getcursorx() {
+    return cursorx;
+}
+
+unsigned int getcursory() {
+    return cursory;
+}
+
+char getcursoron() {
+    return cursoron;
+}
+
+void printchar(char ch) {
     int i;
     
     if (ch == '\n') {
@@ -167,7 +189,7 @@ void printchar(char ch, char cursoron) {
 
 void printstring(char *buf) {
     while (*buf) {
-        printchar(*buf, 1);
+        printchar(*buf);
         buf++;
     }
 }
