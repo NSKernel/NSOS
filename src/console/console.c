@@ -5,24 +5,26 @@
 extern unsigned char iso_font[256*16];
 
 static _Device *consolescreen;
+static unsigned int screenwidth;
+static unsigned int screenheight;
 static unsigned int cursorx;
 static unsigned int cursory;
 static unsigned int cursorxmax;
 static unsigned int cursorymax;
 
-//
-void initconsole(_Device *dev) {
-    _VideoInfoReg info;
-    dev->read(_DEVREG_VIDEO_INFO, &info, sizeof(info));
-    printf("Screen size: %d x %d\n", info.width, info.height);
-    
-    consolescreen = dev;
-    cursorx = 0;
-    cursory = 0;
-    cursorxmax = (info.width - 6) / 8;
-    cursorymax = (info.height - 6) / 17;
-    
-    printf("Screen device id is %08X\n", dev->id);
+static char screenbuf[200][200];
+static unsigned char linestart;
+
+void printstring(char *buf);
+
+void clearscreenbuf() {
+    int i, j;
+    for (i = 0; i < cursorymax; i++) {
+        for (j = 0; j < cursorxmax; j++) {
+            screenbuf[i][j] = ' ';
+        }
+        screenbuf[i][cursorxmax] = '\0';
+    }
 }
 
 // Print a char to the specific position on screen
@@ -46,12 +48,61 @@ void printchar(char ch, int x, int y) {
     }
 }
 
+void refreshscreen() {
+    _FBCtlReg ctl;
+    int i, j;
+    uint32_t pixel = 0x00000000;
+    ctl.x = 0;
+    ctl.y = 0;
+    ctl.w = 1;
+    ctl.h = 1;
+    ctl.sync = 1;
+    ctl.pixels = &pixel;
+    for (i = 0; i < screenwidth; i++) {
+        for (j = 0; j < screenheight; j++) {
+            ctl.x = i;
+            ctl.y = j;
+            consolescreen->write(_DEVREG_VIDEO_FBCTL, &ctl, sizeof(ctl));
+        }
+    }
+    
+    cursorx = 0;
+    cursory = 0;
+    for (i = 0; i < cursorymax; i++) {
+        printstring(screenbuf[linestart + i]);
+    }
+}
+
+//
+void initconsole(_Device *dev) {
+    _VideoInfoReg info;
+    
+    dev->read(_DEVREG_VIDEO_INFO, &info, sizeof(info));
+    screenwidth = info.width;
+    screenheight = info.height;
+    
+    consolescreen = dev;
+    cursorx = 0;
+    cursory = 0;
+    cursorxmax = (info.width - 6) / 8;
+    cursorymax = (info.height - 6) / 17;
+    clearscreenbuf();
+    refreshscreen();
+    
+    printf("Screen device id is %08X\n", dev->id);
+}
+
 void printstring(char *buf) {
+    int i;
     while (*buf) {
         if (*buf == '\n') {
             cursorx = 0;
             if (cursory == cursorymax - 1) {
-                cursory = 0;
+                for (i = 0; i < cursorxmax; i++) {
+                    screenbuf[(linestart - 1) % cursorymax][i] = ' ';
+                }
+                linestart = (linestart + 1) % cursorymax;
+                
             }
             else {
                 cursory += 1;
@@ -59,10 +110,14 @@ void printstring(char *buf) {
         }
         else {
             printchar(*buf, cursorx, cursory);
+            screenbuf[(cursory + linestart) % cursorymax][cursorx] = *buf;
             if (cursorx == cursorxmax - 1) { // new line
                 cursorx = 0;
                 if (cursory == cursorymax - 1) {
-                    cursory = 0;
+                    for (i = 0; i < cursorxmax; i++) {
+                        screenbuf[(linestart - 1) % cursorymax][i] = ' ';
+                    }
+                    linestart = (linestart + 1) % cursorymax;
                 }
                 else {
                     cursory += 1;
@@ -73,6 +128,5 @@ void printstring(char *buf) {
             }
         }
         buf++;
-    }
-    
+    } 
 }
