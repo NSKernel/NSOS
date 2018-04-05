@@ -105,6 +105,9 @@ int main() {
                  case _KEY_SLASH:
                    printstring("/");
                    break;
+                 case _KEY_SPACE:
+                   printstring(" ");
+                   break;
                }
            }
        }
