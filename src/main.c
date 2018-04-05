@@ -49,7 +49,7 @@ int main() {
   while (_device(deviceit) && _device(deviceit)->id != _DEV_INPUT) {
       deviceit += 1;
   }
-  Device *KeyboardDevice = _device(deviceit);
+  _Device *KeyboardDevice = _device(deviceit);
   _KbdReg KeyboardRegister;
   int KeyboardLastStatus = 0;
   while (1) {
