@@ -11,6 +11,15 @@
 //  return 0;
 //}
 
+#define _LETTER_N_NUMS(_) \
+    _(A) _(B) _(C) _(D) _(E) _(F) _(G) _(H) _(I) _(J) _(K) _(L) _(M) \
+    _(N) _(O) _(P) _(Q) _(R) _(S) _(T) _(U) _(V) _(W) _(X) _(Y) _(Z) \
+    _(0) _(1) _(2) _(3) _(4) _(5) _(6) _(7) _(8) _(9)
+    
+#define _WRITE_LNN(k) case _KEY_##k:\
+    printstring("##k##");\
+    break;
+
 static void input_test(_Device *dev);
 static void timer_test(_Device *dev);
 static void video_test(_Device *dev);
@@ -59,8 +68,7 @@ int main() {
            KeyboardLastStatus = KeyboardRegister.keydown;
            if (KeyboardLastStatus) {
                switch (KeyboardRegister.keycode) {
-                 case _KEY_A:
-                     printstring("A");
+                 _LETTER_N_NUMS(_WRITE_LNN)
                }
            }
        }
