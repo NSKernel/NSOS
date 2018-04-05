@@ -80,6 +80,72 @@ int main() {
            if (KeyboardRegister.keydown == 1) {
                //printf("SHIFT = %d, CAPSLOCK = %d\n", ()
                switch (KeyboardRegister.keycode) {
+                 case _KEY_GRAVE:
+                   if (LShiftDown | RShiftDown)
+                       printstring("~");
+                   else
+                       printstring("`");
+                   break;
+                 case _KEY_1:
+                   if (LShiftDown | RShiftDown)
+                       printstring("!");
+                   else
+                       printstring("1");
+                   break;
+                 case _KEY_2:
+                   if (LShiftDown | RShiftDown)
+                       printstring("@");
+                   else
+                       printstring("2");
+                   break;
+                 case _KEY_3:
+                   if (LShiftDown | RShiftDown)
+                       printstring("#");
+                   else
+                       printstring("3");
+                   break;
+                 case _KEY_4:
+                   if (LShiftDown | RShiftDown)
+                       printstring("$");
+                   else
+                       printstring("4");
+                   break;
+                 case _KEY_5:
+                   if (LShiftDown | RShiftDown)
+                       printstring("%");
+                   else
+                       printstring("5");
+                   break;
+                 case _KEY_6:
+                   if (LShiftDown | RShiftDown)
+                       printstring("^");
+                   else
+                       printstring("6");
+                   break;
+                 case _KEY_7:
+                   if (LShiftDown | RShiftDown)
+                       printstring("&");
+                   else
+                       printstring("7");
+                   break;
+                 case _KEY_8:
+                   if (LShiftDown | RShiftDown)
+                       printstring("*");
+                   else
+                       printstring("8");
+                   break;
+                 case _KEY_9:
+                   if (LShiftDown | RShiftDown)
+                       printstring("(");
+                   else
+                       printstring("9");
+                   break;
+                 case _KEY_0:
+                   if (LShiftDown | RShiftDown)
+                       printstring(")");
+                   else
+                       printstring("0");
+                   break;
                  _LETTER(_WRITE_LETTER)
                  case _KEY_CAPSLOCK:
                    CapsLock ^= 1;
