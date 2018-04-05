@@ -48,9 +48,9 @@ int main() {
   printstring("Test\n");
   printstring("abcdefghijklmnopqrstuvwxyz12345678901234567890abcdefghijklmnopqrstuvwxyz12345678901234567890");
   while (1) {
-      sprintf(buf, "Hello the %d times.\n", count);
+      sprintf(testbuf, "Hello the %d times.\n", count);
       count += 1;
-      printstring(buf); 
+      printstring(testbuf); 
   }
   return 0;
 }
