@@ -19,6 +19,8 @@ static void ata_test(_Device *dev);
 
 int main() {
   int deviceit;
+  char testbuf[100];
+  unsigned int count = 0;
 
   if (_ioe_init() != 0) _halt(1);
   printf("_heap = [%08x, %08x)\n", _heap.start, _heap.end);
@@ -46,7 +48,9 @@ int main() {
   printstring("Test\n");
   printstring("abcdefghijklmnopqrstuvwxyz12345678901234567890abcdefghijklmnopqrstuvwxyz12345678901234567890");
   while (1) {
-      printstring("Hello\n"); 
+      sprintf(buf, "Hello the %d times.\n", count);
+      count += 1;
+      printstring(buf); 
   }
   return 0;
 }

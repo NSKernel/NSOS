@@ -105,7 +105,7 @@ void printstring(char *buf) {
                     screenbuf[(linestart - 1) % cursorymax][i] = ' ';
                 }
                 linestart = (linestart + 1) % cursorymax;
-                
+                refreshscreen();
             }
             else {
                 cursory += 1;
@@ -121,6 +121,7 @@ void printstring(char *buf) {
                         screenbuf[(linestart - 1) % cursorymax][i] = ' ';
                     }
                     linestart = (linestart + 1) % cursorymax;
+                    refreshscreen();
                 }
                 else {
                     cursory += 1;
