@@ -83,12 +83,15 @@ void printcursor(int x, int y) {
 }
 
 void refreshscreen() {
-    int i;
+    int i, j;
     
     cursorx = 0;
     cursory = 0;
     for (i = 0; i < cursorymax - 1; i++) {
-        printstring(screenbuf[(linestart + i) % cursorymax]);
+        for (j = 0; j < cursorxmax; j++) {
+            printcharpos(screenbuf[(linestart + i) % cursorymax][j], j, i);
+        }
+        //printstring(screenbuf[(linestart + i) % cursorymax]);
     }
     for (i = 0; i < cursorxmax; i++) {
         printcharpos(' ', i, cursorymax - 1);
@@ -118,7 +121,7 @@ void initconsole(_Device *dev) {
     printf("Screen device id is %08X\n", dev->id);
 }
 
-void printchar(char ch) {
+void printchar(char ch, char cursoron) {
     int i;
     
     if (ch == '\n') {
@@ -155,12 +158,13 @@ void printchar(char ch) {
             cursorx += 1;
         }
     }
-    printcursor(cursorx, cursory);
+    if (cursoron)
+        printcursor(cursorx, cursory);
 }
 
 void printstring(char *buf) {
     while (*buf) {
-        printchar(*buf);
+        printchar(*buf, 1);
         buf++;
     }
 }
