@@ -119,6 +119,8 @@ void initconsole(_Device *dev) {
     cursorx = 0;
     cursory = 0;
     
+    printcursor(0, 0);
+    
     printf("Screen device id is %08X\n", dev->id);
 }
 
