@@ -11,13 +11,12 @@
 //  return 0;
 //}
 
-#define _LETTER_N_NUMS(_) \
+#define _LETTER(_) \
     _(A) _(B) _(C) _(D) _(E) _(F) _(G) _(H) _(I) _(J) _(K) _(L) _(M) \
-    _(N) _(O) _(P) _(Q) _(R) _(S) _(T) _(U) _(V) _(W) _(X) _(Y) _(Z) \
-    _(0) _(1) _(2) _(3) _(4) _(5) _(6) _(7) _(8) _(9)
+    _(N) _(O) _(P) _(Q) _(R) _(S) _(T) _(U) _(V) _(W) _(X) _(Y) _(Z) 
     
-#define _WRITE_LNN(k) case _KEY_##k:\
-    printstring(#k);\
+#define _WRITE_LETTER(k) case _KEY_##k:\
+    printchar(ASCIITable['##k##'][(CapsLock ^ (LShiftDown & RShfitDown) ? 0 : 1)];\
     break;
 
 static void input_test(_Device *dev);
@@ -26,8 +25,17 @@ static void video_test(_Device *dev);
 static void pciconf_test(_Device *dev);
 static void ata_test(_Device *dev);
 
+char ASCIITable[255][2];
+char CapsLock;
+char LShiftDown;
+char RShiftDown;
+
 int main() {
   int deviceit;
+  
+  CapsDown = 0;
+  LShiftDown = 0;
+  RShiftDown = 0;
 
   if (_ioe_init() != 0) _halt(1);
   printf("_heap = [%08x, %08x)\n", _heap.start, _heap.end);
@@ -45,6 +53,11 @@ int main() {
     printf("\n");
   }
   //_Device *screen;
+  // init ASCII Table
+  for (int i = 'A'; i < 'Z'; i++) {
+      ASCIITable[i][0] = i;
+      ASCIITable[i][1] = i + 'a' - 'A';
+  }
   deviceit = 1;
   while (_device(deviceit) && _device(deviceit)->id != _DEV_VIDEO) {
       deviceit += 1;
@@ -60,54 +73,61 @@ int main() {
   }
   _Device *KeyboardDevice = _device(deviceit);
   _KbdReg KeyboardRegister;
-  int KeyboardLastStatus = 0;
   while (1) {
        KeyboardDevice->read(_DEVREG_INPUT_KBD, &KeyboardRegister, sizeof(KeyboardRegister));
        
-       if (KeyboardLastStatus != KeyboardRegister.keydown) {
-           KeyboardLastStatus = KeyboardRegister.keydown;
-           if (KeyboardLastStatus) {
-               switch (KeyboardRegister.keycode) {
-                 _LETTER_N_NUMS(_WRITE_LNN)
-                 case _KEY_RETURN:
-                   printstring("\n");
-                   break;
-                 case _KEY_MINUS:
-                   printstring("-");
-                   break;
-                 case _KEY_EQUALS:
-                   printstring("=");
-                   break;
-                 case _KEY_TAB:
-                   printstring("    ");
-                   break;
-                 case _KEY_LEFTBRACKET:
-                   printstring("[");
-                   break;
-                 case _KEY_RIGHTBRACKET:
-                   printstring("]");
-                   break;
-                 case _KEY_BACKSLASH:
-                   printstring("\\");
-                   break;
-                 case _KEY_SEMICOLON:
-                   printstring(";");
-                   break;
-                 case _KEY_APOSTROPHE:
-                   printstring("\'");
-                   break;
-                 case _KEY_COMMA:
-                   printstring(",");
-                   break;
-                 case _KEY_PERIOD:
-                   printstring(".");
-                   break;
-                 case _KEY_SLASH:
-                   printstring("/");
-                   break;
-                 case _KEY_SPACE:
-                   printstring(" ");
-                   break;
+       if (KeyboardRegister.keycode != _KEY_NONE) {
+           if (KeyboardRegister.keydown == 1) {
+               if (KeyboardLastStatus) {
+                   switch (KeyboardRegister.keycode) {
+                     _LETTER(_WRITE_LETTER)
+                     
+                     case _KEY_RETURN:
+                       printstring("\n");
+                       break;
+                     case _KEY_MINUS:
+                       printstring("-");
+                       break;
+                     case _KEY_EQUALS:
+                       printstring("=");
+                       break;
+                     case _KEY_TAB:
+                       printstring("    ");
+                       break;
+                     case _KEY_LEFTBRACKET:
+                       printstring("[");
+                       break;
+                     case _KEY_RIGHTBRACKET:
+                       printstring("]");
+                       break;
+                     case _KEY_BACKSLASH:
+                       printstring("\\");
+                       break;
+                     case _KEY_SEMICOLON:
+                       printstring(";");
+                       break;
+                     case _KEY_APOSTROPHE:
+                       printstring("\'");
+                       break;
+                     case _KEY_COMMA:
+                       printstring(",");
+                       break;
+                     case _KEY_PERIOD:
+                       printstring(".");
+                       break;
+                     case _KEY_SLASH:
+                       printstring("/");
+                       break;
+                     case _KEY_SPACE:
+                       printstring(" ");
+                       break;
+                     case _KEY_LSHIFT:
+                       ShiftDown = 1;
+                       break;
+                     case _KEY_RSHIFT:
+                       ShiftDown = 1;
+                       break;
+                   }
                }
            }
        }

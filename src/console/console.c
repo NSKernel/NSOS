@@ -45,7 +45,7 @@ void clearscreen() {
 }
 
 // Print a char to the specific position on screen
-void printchar(char ch, int x, int y) {
+void printcharpos(char ch, int x, int y) {
     unsigned char selector = 1;
     int i, j;
     // Pixel position is 8 * x, 16 * y(additional space between lines)
@@ -118,14 +118,27 @@ void initconsole(_Device *dev) {
     printf("Screen device id is %08X\n", dev->id);
 }
 
-void printstring(char *buf) {
-    int i;
-    while (*buf) {
-        if (*buf == '\n') {
-            printchar(*buf, cursorx, cursory);
+void printchar(char ch) {
+    if (ch == '\n') {
+        printchar(*buf, cursorx, cursory);
+        cursorx = 0;
+        if (cursory == cursorymax - 1) { 
+            for (i = 0; i < cursorxmax; i++) {
+                screenbuf[(linestart + cursory + 1) % cursorymax][i] = ' ';
+            }
+            linestart = (linestart + 1) % cursorymax;
+            refreshscreen();
+        }
+        else {
+            cursory += 1;
+        }
+    }
+    else {
+        printchar(ch, cursorx, cursory);
+        screenbuf[(cursory + linestart) % cursorymax][cursorx] = ch;
+        if (cursorx == cursorxmax - 1) { // new line
             cursorx = 0;
             if (cursory == cursorymax - 1) {
-                
                 for (i = 0; i < cursorxmax; i++) {
                     screenbuf[(linestart + cursory + 1) % cursorymax][i] = ' ';
                 }
@@ -137,26 +150,16 @@ void printstring(char *buf) {
             }
         }
         else {
-            printchar(*buf, cursorx, cursory);
-            screenbuf[(cursory + linestart) % cursorymax][cursorx] = *buf;
-            if (cursorx == cursorxmax - 1) { // new line
-                cursorx = 0;
-                if (cursory == cursorymax - 1) {
-                    for (i = 0; i < cursorxmax; i++) {
-                        screenbuf[(linestart + cursory + 1) % cursorymax][i] = ' ';
-                    }
-                    linestart = (linestart + 1) % cursorymax;
-                    refreshscreen();
-                }
-                else {
-                    cursory += 1;
-                }
-            }
-            else {
-                cursorx += 1;
-            }
+            cursorx += 1;
         }
-        buf++;
     }
     printcursor(cursorx, cursory);
+}
+
+void printstring(char *buf) {
+    int i;
+    while (*buf) {
+        printchar(*buf)
+        buf++;
+    }
 }
