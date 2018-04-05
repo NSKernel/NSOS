@@ -1,3 +1,5 @@
+#include <am.h>
+
 void *memset(void *b, int c, size_t n) {
     char realc = c;
     char *B = (char*)b;
