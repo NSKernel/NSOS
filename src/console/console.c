@@ -14,11 +14,11 @@ void setscreen(_Device *dev) {
 
 // Print a char to the specific position on screen
 void printchar(char ch, int x, int y) {
-    unsigned char selector = 0x80;
+    unsigned char selector = 1;
     int i, j;
     // Pixel position is (8 + 1) * x, (16 + 1) * y
     for (j = 0; j < 16; j++) {
-        selector = 0x80;
+        selector = 1;
         for (i = 0; i < 8; i++) {
             _FBCtlReg ctl;
             uint32_t pixel = ((iso_font[16 * ch + j] & selector) ? 0x00FFFFFF : 0x00000000);
@@ -28,9 +28,7 @@ void printchar(char ch, int x, int y) {
             ctl.sync = 1;
             ctl.pixels = &pixel;
             consolescreen->write(_DEVREG_VIDEO_FBCTL, &ctl, sizeof(ctl));
-            selector >>= 1;
+            selector <<= 1;
         }
-        printf("\n");
-        
     }
 }
