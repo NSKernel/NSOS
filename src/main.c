@@ -16,7 +16,7 @@
     _(N) _(O) _(P) _(Q) _(R) _(S) _(T) _(U) _(V) _(W) _(X) _(Y) _(Z) 
     
 #define _WRITE_LETTER(k) case _KEY_##k:\
-    printchar(ASCIITable[(int)#k[0]][(CapsLock ^ (LShiftDown & RShiftDown) ? 0 : 1)]);\
+    printchar(ASCIITable[(int)#k[0] - 'A'][(CapsLock ^ (LShiftDown & RShiftDown) ? 0 : 1)]);\
     break;
 
 static void input_test(_Device *dev);
@@ -55,8 +55,8 @@ int main() {
   //_Device *screen;
   // init ASCII Table
   for (int i = 'A'; i < 'Z'; i++) {
-      ASCIITable[i][0] = i;
-      ASCIITable[i][1] = i + 'a' - 'A';
+      ASCIITable[i - 'A'][0] = i;
+      ASCIITable[i - 'A'][1] = i + 'a' - 'A';
   }
   deviceit = 1;
   while (_device(deviceit) && _device(deviceit)->id != _DEV_VIDEO) {
