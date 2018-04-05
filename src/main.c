@@ -43,7 +43,7 @@ int main() {
   }
   
   initconsole(_device(deviceit));
-  printstring("Test\nHello");
+  printstring("Test\n");
   printstring("abcdefghijklmnopqrstuvwxyz12345678901234567890abcdefghijklmnopqrstuvwxyz12345678901234567890");
   return 0;
 }
