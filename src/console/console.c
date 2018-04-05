@@ -71,7 +71,7 @@ void refreshscreen() {
     cursorx = 0;
     cursory = 0;
     for (i = 0; i < cursorymax; i++) {
-        printf("clearing with data from row %d", (linestart + i) % cursorymax);
+        printf("clearing with data from row %d, i = %d, ymax = %d\n", (linestart + i) % cursorymax, i, cursorymax);
         printstring(screenbuf[(linestart + i) % cursorymax]);
     }
 }
