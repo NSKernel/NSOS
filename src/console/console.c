@@ -89,7 +89,7 @@ void refreshscreen() {
     cursory = 0;
     for (i = 0; i < cursorymax - 1; i++) {
         for (j = 0; j < cursorxmax; j++) {
-            printcharpos(screenbuf[(linestart + i) % cursorymax][j], j, i);
+            printchar(screenbuf[(linestart + i) % cursorymax][j], 0);
         }
         //printstring(screenbuf[(linestart + i) % cursorymax]);
     }
