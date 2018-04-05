@@ -1,5 +1,6 @@
 #include <am.h>
 #include <amdev.h>
+#include <stdio.h>
 
 extern unsigned char iso_font[256*16];
 
@@ -17,6 +18,7 @@ void printchar(char ch, int x, int y) {
     // Pixel position is (8 + 1) * x, (16 + 1) * y
     for (j = 0; j < 16; j++) {
         for (i = 0; i < 8; i++) {
+            printf("i = %d, j = %d\n", i, j);
             _FBCtlReg ctl;
             uint32_t pixel = ((iso_font[16 * ch + j] & selector) ? 0x00FFFFFF : 0x00000000);
             ctl.x = 9 * x + i + 3;  // 3 more pixels from the left
@@ -25,6 +27,7 @@ void printchar(char ch, int x, int y) {
             ctl.sync = 1;
             ctl.pixels = &pixel;
             consolescreen->write(_DEVREG_VIDEO_FBCTL, &ctl, sizeof(ctl));
+            printf("Pixel written.\n");
         }
         selector >>= 1;
     }
