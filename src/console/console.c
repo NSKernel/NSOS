@@ -16,14 +16,14 @@ void setscreen(_Device *dev) {
 void printchar(char ch, int x, int y) {
     unsigned char selector = 1;
     int i, j;
-    // Pixel position is (8 + 1) * x, (16 + 1) * y
+    // Pixel position is 8 * x, 16 * y
     for (j = 0; j < 16; j++) {
         selector = 1;
         for (i = 0; i < 8; i++) {
             _FBCtlReg ctl;
             uint32_t pixel = ((iso_font[16 * ch + j] & selector) ? 0x00FFFFFF : 0x00000000);
-            ctl.x = 9 * x + i + 3;  // 3 more pixels from the left
-            ctl.y = 17 * y + j + 3; // 3 more pixels from the top
+            ctl.x = 8 * x + i + 3;  // 3 more pixels from the left
+            ctl.y = 16 * y + j + 3; // 3 more pixels from the top
             ctl.w = ctl.h = 1;
             ctl.sync = 1;
             ctl.pixels = &pixel;
