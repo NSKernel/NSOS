@@ -141,6 +141,7 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 
     for (str=buf ; *fmt ; ++fmt) {
         if (*fmt != '%') {
+            _putc(*str);
             *str++ = *fmt;
             continue;
         }
