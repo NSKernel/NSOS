@@ -47,7 +47,7 @@ void printchar(char ch, int x, int y) {
 }
 
 void printstring(char *buf) {
-    while (*buf++) {
+    while (*buf) {
         if (*buf == '\n') {
             cursorx = 0;
             if (cursory == cursorymax) {
@@ -72,6 +72,7 @@ void printstring(char *buf) {
                 cursorx += 1;
             }
         }
+        buf++;
     }
     
 }
