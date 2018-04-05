@@ -73,7 +73,7 @@ void refreshscreen() {
     for (i = 0; i < cursorymax; i++) {
         printf("clearing with data from row %d, i = %d, ymax = %d\n", (linestart + i) % cursorymax, i, cursorymax);
         printstring(screenbuf[(linestart + i) % cursorymax]);
-        printf("i  after c = %d", i);
+        printf("i after c = %d\n", i);
     }
     printf("ended");
 }
