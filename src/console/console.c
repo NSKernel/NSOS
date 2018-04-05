@@ -65,6 +65,24 @@ void printchar(char ch, int x, int y) {
     }
 }
 
+void printcursor(int x, int y) {
+    int i, j;
+    // Pixel position is 8 * x, 16 * y(additional space between lines)
+    for (j = 0; j < 16; j++) {
+        selector = 1;
+        for (i = 0; i < 8; i++) {
+            _FBCtlReg ctl;
+            uint32_t pixel = 0x00FFFFFF;
+            ctl.x = 8 * x + i + 3;  // 3 more pixels from the left
+            ctl.y = 16 * y + j + 3; // 3 more pixels from the top
+            ctl.w = ctl.h = 1;
+            ctl.sync = 1;
+            ctl.pixels = &pixel;
+            consolescreen->write(_DEVREG_VIDEO_FBCTL, &ctl, sizeof(ctl));
+        }
+    }
+}
+
 void refreshscreen() {
     int i;
     
@@ -139,5 +157,6 @@ void printstring(char *buf) {
             }
         }
         buf++;
-    } 
+    }
+    printcursor(cursorx, cursory);
 }
