@@ -16,7 +16,7 @@
     _(N) _(O) _(P) _(Q) _(R) _(S) _(T) _(U) _(V) _(W) _(X) _(Y) _(Z) 
     
 #define _WRITE_LETTER(k) case _KEY_##k:\
-    printchar(ASCIITable[(int)#k[0] - 'A'][(CapsLock ^ (LShiftDown | RShiftDown) ? 1 : 0)]);\
+    printchar(ASCIITable[(int)#k[0] - 'A'][(CapsLock ^ (LShiftDown | RShiftDown) ? 0 : 1)]);\
     break;
 
 static void input_test(_Device *dev);
@@ -81,42 +81,74 @@ int main() {
                //printf("SHIFT = %d, CAPSLOCK = %d\n", ()
                switch (KeyboardRegister.keycode) {
                  _LETTER(_WRITE_LETTER)
-                 
+                 case _KEY_CAPSLOCK:
+                   CapsLock ^= 1;
+                   break;
                  case _KEY_RETURN:
                    printstring("\n");
                    break;
                  case _KEY_MINUS:
-                   printstring("-");
+                   if (LShiftDown | RShiftDown)
+                       printstring("_");
+                   else
+                       printstring("-");
                    break;
                  case _KEY_EQUALS:
-                   printstring("=");
+                   if (LShiftDown | RShiftDown)
+                       printstring("+");
+                   else
+                       printstring("=");
                    break;
                  case _KEY_TAB:
                    printstring("    ");
                    break;
                  case _KEY_LEFTBRACKET:
-                   printstring("[");
+                   if (LShiftDown | RShiftDown)
+                       printstring("{");
+                   else
+                       printstring("[");
                    break;
                  case _KEY_RIGHTBRACKET:
-                   printstring("]");
+                   if (LShiftDown | RShiftDown)
+                       printstring("}");
+                   else
+                       printstring("]");
                    break;
                  case _KEY_BACKSLASH:
-                   printstring("\\");
+                   if (LShiftDown | RShiftDown)
+                       printstring("|");
+                   else
+                       printstring("\\");
                    break;
                  case _KEY_SEMICOLON:
-                   printstring(";");
+                   if (LShiftDown | RShiftDown)
+                       printstring(":");
+                   else
+                       printstring(";");
                    break;
                  case _KEY_APOSTROPHE:
-                   printstring("\'");
+                   if (LShiftDown | RShiftDown)
+                       printstring("\"");
+                   else
+                       printstring("\'");
                    break;
                  case _KEY_COMMA:
-                   printstring(",");
+                   if (LShiftDown | RShiftDown)
+                       printstring("<");
+                   else
+                       printstring(",");
                    break;
                  case _KEY_PERIOD:
-                   printstring(".");
+                   if (LShiftDown | RShiftDown)
+                       printstring(">");
+                   else
+                       printstring(".");
                    break;
                  case _KEY_SLASH:
-                   printstring("/");
+                   if (LShiftDown | RShiftDown)
+                       printstring("?");
+                   else
+                       printstring("/");
                    break;
                  case _KEY_SPACE:
                    printstring(" ");
@@ -128,6 +160,16 @@ int main() {
                    RShiftDown = 1;
                    break;
                    
+               }
+           }
+           else {
+               switch (KeyboardRegister.keycode) {
+                 case _KEY_LSHIFT:
+                   LShiftDown = 0;
+                   break;
+                 case _KEY_RSHIFT:
+                   RShiftDown = 0;
+                   break;
                }
            }
        }
