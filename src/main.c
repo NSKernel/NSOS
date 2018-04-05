@@ -109,24 +109,24 @@ int main() {
                    printstring("\'");
                    break;
                  case _KEY_COMMA:
-                       printstring(",");
-                       break;
-                     case _KEY_PERIOD:
-                       printstring(".");
-                       break;
-                     case _KEY_SLASH:
-                       printstring("/");
-                       break;
-                     case _KEY_SPACE:
-                       printstring(" ");
-                       break;
-                     case _KEY_LSHIFT:
-                       ShiftDown = 1;
-                       break;
-                     case _KEY_RSHIFT:
-                       ShiftDown = 1;
-                       break;
-                   }
+                   printstring(",");
+                   break;
+                 case _KEY_PERIOD:
+                   printstring(".");
+                   break;
+                 case _KEY_SLASH:
+                   printstring("/");
+                   break;
+                 case _KEY_SPACE:
+                   printstring(" ");
+                   break;
+                 case _KEY_LSHIFT:
+                   LShiftDown = 1;
+                   break;
+                 case _KEY_RSHIFT:
+                   RShiftDown = 1;
+                   break;
+                   
                }
            }
        }
