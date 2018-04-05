@@ -71,7 +71,7 @@ void refreshscreen() {
     cursorx = 0;
     cursory = 0;
     for (i = 0; i < cursorymax; i++) {
-        printstring(screenbuf[linestart + i]);
+        printstring(screenbuf[(linestart + i) % cursorymax]);
     }
 }
 
