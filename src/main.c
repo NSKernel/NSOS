@@ -46,7 +46,7 @@ int main() {
   
   initconsole(_device(deviceit));
   
-  while (count < 40) {
+  while (count < 29) {
       sprintf(testbuf, "Hello the %d times.\n", count);
       count += 1;
       printstring(testbuf); 
