@@ -16,6 +16,7 @@ static char screenbuf[200][200];
 static unsigned char linestart;
 
 void printstring(char *buf);
+void printchar(char ch, char cursoron);
 
 void clearscreen() {
     int i, j;
