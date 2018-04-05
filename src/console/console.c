@@ -69,7 +69,6 @@ void printcursor(int x, int y) {
     int i, j;
     // Pixel position is 8 * x, 16 * y(additional space between lines)
     for (j = 0; j < 16; j++) {
-        selector = 1;
         for (i = 0; i < 8; i++) {
             _FBCtlReg ctl;
             uint32_t pixel = 0x00FFFFFF;
