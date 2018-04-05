@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <am.h>
 
-static char printbuf[1024];
+char printbuf[1024];
 
 int printf(const char *fmt, ...) {
     va_list args;
