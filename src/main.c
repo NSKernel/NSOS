@@ -47,7 +47,7 @@ int main() {
   initconsole(_device(deviceit));
   printstring("Test\n");
   printstring("abcdefghijklmnopqrstuvwxyz12345678901234567890abcdefghijklmnopqrstuvwxyz12345678901234567890");
-  while (1) {
+  while (count < 25) {
       sprintf(testbuf, "Hello the %d times.\n", count);
       count += 1;
       printstring(testbuf); 
