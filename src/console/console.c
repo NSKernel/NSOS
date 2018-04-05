@@ -119,8 +119,7 @@ void printstring(char *buf) {
             screenbuf[(cursory + linestart) % cursorymax][cursorx] = *buf;
             if (cursorx == cursorxmax - 1) { // new line
                 cursorx = 0;
-                if (cursory == cursorymax - 2) {
-                    cursory += 1;
+                if (cursory == cursorymax - 1) {
                     for (i = 0; i < cursorxmax; i++) {
                         screenbuf[(linestart + cursory + 1) % cursorymax][i] = ' ';
                     }
