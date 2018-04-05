@@ -16,7 +16,7 @@
     _(N) _(O) _(P) _(Q) _(R) _(S) _(T) _(U) _(V) _(W) _(X) _(Y) _(Z) 
     
 #define _WRITE_LETTER(k) case _KEY_##k:\
-    printchar(ASCIITable[(int)#k[0] - 'A'][(CapsLock ^ (LShiftDown & RShiftDown) ? 0 : 1)]);\
+    printchar(ASCIITable[(int)#k[0] - 'A'][(CapsLock ^ (LShiftDown | RShiftDown) ? 1 : 0)]);\
     break;
 
 static void input_test(_Device *dev);
@@ -78,6 +78,7 @@ int main() {
        
        if (KeyboardRegister.keycode != _KEY_NONE) {
            if (KeyboardRegister.keydown == 1) {
+               //printf("SHIFT = %d, CAPSLOCK = %d\n", ()
                switch (KeyboardRegister.keycode) {
                  _LETTER(_WRITE_LETTER)
                  
@@ -122,7 +123,6 @@ int main() {
                    break;
                  case _KEY_LSHIFT:
                    LShiftDown = 1;
-                   printf("SetLSHIFT");
                    break;
                  case _KEY_RSHIFT:
                    RShiftDown = 1;
