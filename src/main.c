@@ -33,7 +33,7 @@ char RShiftDown;
 int main() {
   int deviceit;
   
-  CapsDown = 0;
+  CapsLock = 0;
   LShiftDown = 0;
   RShiftDown = 0;
 
@@ -78,38 +78,37 @@ int main() {
        
        if (KeyboardRegister.keycode != _KEY_NONE) {
            if (KeyboardRegister.keydown == 1) {
-               if (KeyboardLastStatus) {
-                   switch (KeyboardRegister.keycode) {
-                     _LETTER(_WRITE_LETTER)
-                     
-                     case _KEY_RETURN:
-                       printstring("\n");
-                       break;
-                     case _KEY_MINUS:
-                       printstring("-");
-                       break;
-                     case _KEY_EQUALS:
-                       printstring("=");
-                       break;
-                     case _KEY_TAB:
-                       printstring("    ");
-                       break;
-                     case _KEY_LEFTBRACKET:
-                       printstring("[");
-                       break;
-                     case _KEY_RIGHTBRACKET:
-                       printstring("]");
-                       break;
-                     case _KEY_BACKSLASH:
-                       printstring("\\");
-                       break;
-                     case _KEY_SEMICOLON:
-                       printstring(";");
-                       break;
-                     case _KEY_APOSTROPHE:
-                       printstring("\'");
-                       break;
-                     case _KEY_COMMA:
+               switch (KeyboardRegister.keycode) {
+                 _LETTER(_WRITE_LETTER)
+                 
+                 case _KEY_RETURN:
+                   printstring("\n");
+                   break;
+                 case _KEY_MINUS:
+                   printstring("-");
+                   break;
+                 case _KEY_EQUALS:
+                   printstring("=");
+                   break;
+                 case _KEY_TAB:
+                   printstring("    ");
+                   break;
+                 case _KEY_LEFTBRACKET:
+                   printstring("[");
+                   break;
+                 case _KEY_RIGHTBRACKET:
+                   printstring("]");
+                   break;
+                 case _KEY_BACKSLASH:
+                   printstring("\\");
+                   break;
+                 case _KEY_SEMICOLON:
+                   printstring(";");
+                   break;
+                 case _KEY_APOSTROPHE:
+                   printstring("\'");
+                   break;
+                 case _KEY_COMMA:
                        printstring(",");
                        break;
                      case _KEY_PERIOD:
