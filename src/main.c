@@ -39,11 +39,32 @@ int main() {
   deviceit = 1;
   while (_device(deviceit) && _device(deviceit)->id != _DEV_VIDEO) {
       deviceit += 1;
-      printf("Device id = %08X %s _DEV_VIDEO\n", (_device(deviceit)->id != _DEV_VIDEO ? "!=" : "=="));
   }
   
   initconsole(_device(deviceit));
   printstring("NS/OS 0 Console Test Space\nCopyright (C) 2018 NSKernel. All rights reserved\n\nYou may Type anything and it will show on the screen.\nBackspace is NOT AVAILABLE.\n\n");
+  
+  //_Device *screen;
+  deviceit = 1;
+  while (_device(deviceit) && _device(deviceit)->id != _DEV_INPUT) {
+      deviceit += 1;
+  }
+  Device *KeyboardDevice = _device(deviceit);
+  _KbdReg KeyboardRegister;
+  int KeyboardLastStatus = 0;
+  while (1) {
+       KeyboardDevice->read(_DEVREG_INPUT_KBD, &KeyboardRegister, sizeof(KeyboardRegister));
+       
+       if (KeyboardLastStatus != KeyboardRegister.keydown) {
+           KeyboardLastStatus = KeyboardRegister.keydown;
+           if (KeyboardLastStatus) {
+               switch (KeyboardRegister.keycode) {
+                 case _KEY_A:
+                     printstring("A");
+               }
+           }
+       }
+  }
   return 0;
 }
 
