@@ -17,6 +17,7 @@
 
 #include <stdarg.h>
 #include <ctype.h>
+#include <string.h>
 
 unsigned long simple_strtoul(const char *cp,char **endp,unsigned int base)
 {
@@ -131,12 +132,12 @@ int vsprintf(char *buf, const char *fmt, va_list args)
     char *s;
     int *ip;
 
-    int flags;        /* flags to number() */
+    int flags;            /* flags to number() */
 
-    int field_width;    /* width of output field */
+    int field_width;      /* width of output field */
     int precision;        /* min. # of digits for integers; max
-                   number of chars for from string */
-    int qualifier;        /* 'h', 'l', or 'L' for integer fields */
+                             number of chars for from string */
+    //int qualifier;        /* 'h', 'l', or 'L' for integer fields */
 
     for (str=buf ; *fmt ; ++fmt) {
         if (*fmt != '%') {
@@ -181,9 +182,9 @@ int vsprintf(char *buf, const char *fmt, va_list args)
                 precision = 0;
         }
         /* get the conversion qualifier */
-        qualifier = -1;
+        //qualifier = -1;
         if (*fmt == 'h' || *fmt == 'l' || *fmt == 'L') {
-            qualifier = *fmt;
+            //qualifier = *fmt;
             ++fmt;
         }
         switch (*fmt) {
