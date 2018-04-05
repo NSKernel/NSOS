@@ -88,6 +88,7 @@ void initconsole(_Device *dev) {
     cursory = 0;
     cursorxmax = (info.width - 6) / 8;
     cursorymax = (info.height - 6) / 16;
+    linestart = 0;
     clearscreen();
     refreshscreen();
     
