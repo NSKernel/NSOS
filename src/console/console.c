@@ -122,6 +122,7 @@ void printstring(char *buf) {
     int i;
     while (*buf) {
         if (*buf == '\n') {
+            printchar(*buf, cursorx, cursory);
             cursorx = 0;
             if (cursory == cursorymax - 1) {
                 
