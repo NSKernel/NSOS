@@ -90,7 +90,7 @@ int main() {
                  case _KEY_BACKSLASH:
                    printstring("\\");
                    break;
-                 case _KEY_SEMICONLON:
+                 case _KEY_SEMICOLON:
                    printstring(";");
                    break;
                  case _KEY_APOSTROPHE:
