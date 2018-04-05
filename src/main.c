@@ -17,7 +17,7 @@
     _(0) _(1) _(2) _(3) _(4) _(5) _(6) _(7) _(8) _(9)
     
 #define _WRITE_LNN(k) case _KEY_##k:\
-    printstring("##k##");\
+    printstring(## #k##);\
     break;
 
 static void input_test(_Device *dev);
