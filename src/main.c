@@ -54,7 +54,7 @@ int main() {
   }
   //_Device *screen;
   // init ASCII Table
-  for (int i = 'A'; i < 'Z'; i++) {
+  for (int i = 'A'; i <= 'Z'; i++) {
       ASCIITable[i - 'A'][0] = i;
       ASCIITable[i - 'A'][1] = i + 'a' - 'A';
   }
