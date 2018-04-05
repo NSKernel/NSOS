@@ -37,8 +37,10 @@ int main() {
   }
   //_Device *screen;
   deviceit = 1;
-  while (!_device(deviceit) && _device(deviceit)->id != _DEV_VIDEO)
+  while (!_device(deviceit) && _device(deviceit)->id != _DEV_VIDEO) {
       deviceit += 1;
+      printf("Device id = %08X %s _DEV_VIDEO\n", (_device(deviceit)->id != _DEV_VIDEO ? "!=" : "=="));
+  }
   printf("Found screen.\n");
   setscreen(_device(deviceit));
   printf("Screen set.\n");
