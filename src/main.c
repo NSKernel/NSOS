@@ -16,7 +16,7 @@
     _(N) _(O) _(P) _(Q) _(R) _(S) _(T) _(U) _(V) _(W) _(X) _(Y) _(Z) 
     
 #define _WRITE_LETTER(k) case _KEY_##k:\
-    printchar(ASCIITable['##k##'][(CapsLock ^ (LShiftDown & RShfitDown) ? 0 : 1)];\
+    printchar(ASCIITable['##k'][(CapsLock ^ (LShiftDown & RShfitDown) ? 0 : 1)];\
     break;
 
 static void input_test(_Device *dev);
