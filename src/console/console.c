@@ -17,13 +17,30 @@ static unsigned char linestart;
 
 void printstring(char *buf);
 
-void clearscreenbuf() {
+void clearscreen() {
     int i, j;
+    _FBCtlReg ctl;
+    uint32_t pixel = 0x00000000;
+    
     for (i = 0; i < cursorymax; i++) {
         for (j = 0; j < cursorxmax; j++) {
             screenbuf[i][j] = ' ';
         }
         screenbuf[i][cursorxmax] = '\0';
+    }
+    
+    ctl.x = 0;
+    ctl.y = 0;
+    ctl.w = 1;
+    ctl.h = 1;
+    ctl.sync = 1;
+    ctl.pixels = &pixel;
+    for (i = 0; i < screenwidth; i++) {
+        for (j = 0; j < screenheight; j++) {
+            ctl.x = i;
+            ctl.y = j;
+            consolescreen->write(_DEVREG_VIDEO_FBCTL, &ctl, sizeof(ctl));
+        }
     }
 }
 
@@ -49,26 +66,11 @@ void printchar(char ch, int x, int y) {
 }
 
 void refreshscreen() {
-    _FBCtlReg ctl;
-    int i, j;
-    uint32_t pixel = 0x00000000;
-    ctl.x = 0;
-    ctl.y = 0;
-    ctl.w = 1;
-    ctl.h = 1;
-    ctl.sync = 1;
-    ctl.pixels = &pixel;
-    for (i = 0; i < screenwidth; i++) {
-        for (j = 0; j < screenheight; j++) {
-            ctl.x = i;
-            ctl.y = j;
-            consolescreen->write(_DEVREG_VIDEO_FBCTL, &ctl, sizeof(ctl));
-        }
-    }
+    
     
     cursorx = 0;
     cursory = 0;
-    for (i = 0; i < cursorymax - 1; i++) {
+    for (i = 0; i < cursorymax; i++) {
         printstring(screenbuf[linestart + i]);
     }
 }
@@ -86,7 +88,7 @@ void initconsole(_Device *dev) {
     cursory = 0;
     cursorxmax = (info.width - 6) / 8;
     cursorymax = (info.height - 6) / 17;
-    clearscreenbuf();
+    clearscreen();
     refreshscreen();
     
     cursorx = 0;
@@ -102,7 +104,7 @@ void printstring(char *buf) {
             cursorx = 0;
             if (cursory == cursorymax - 1) {
                 for (i = 0; i < cursorxmax; i++) {
-                    screenbuf[(linestart - 1) % cursorymax][i] = ' ';
+                    screenbuf[(linestart) % cursorymax][i] = ' ';
                 }
                 linestart = (linestart + 1) % cursorymax;
                 refreshscreen();
