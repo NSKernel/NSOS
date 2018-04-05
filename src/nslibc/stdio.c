@@ -11,7 +11,9 @@ int printf(const char *fmt, ...) {
     
     va_start(args, fmt);
     i = vsprintf(printbuf, fmt, args);
-    
+    _putc('T');
+    _putc('0' + i);
+    _putc('\n');
     for (j = 0; j < i; j++)
         _putc(printbuf[i]);
     va_end(args);
