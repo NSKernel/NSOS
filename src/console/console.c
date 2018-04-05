@@ -116,7 +116,6 @@ void printstring(char *buf) {
             }
             else {
                 cursory += 1;
-                printf("cursory re = %d\n", cursory);
             }
         }
         else {
@@ -133,7 +132,6 @@ void printstring(char *buf) {
                 }
                 else {
                     cursory += 1;
-                    printf("cursory rc = %d\n", cursory);
                 }
             }
             else {
