@@ -119,6 +119,8 @@ void initconsole(_Device *dev) {
 }
 
 void printchar(char ch) {
+    int i;
+    
     if (ch == '\n') {
         printchar(*buf, cursorx, cursory);
         cursorx = 0;
@@ -157,7 +159,6 @@ void printchar(char ch) {
 }
 
 void printstring(char *buf) {
-    int i;
     while (*buf) {
         printchar(*buf);
         buf++;
