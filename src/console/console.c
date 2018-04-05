@@ -48,7 +48,7 @@ void clearscreen() {
 void printchar(char ch, int x, int y) {
     unsigned char selector = 1;
     int i, j;
-    // Pixel position is 8 * x, 17 * y(additional space between lines)
+    // Pixel position is 8 * x, 16 * y(additional space between lines)
     for (j = 0; j < 16; j++) {
         selector = 1;
         for (i = 0; i < 8; i++) {
@@ -87,7 +87,7 @@ void initconsole(_Device *dev) {
     cursorx = 0;
     cursory = 0;
     cursorxmax = (info.width - 6) / 8;
-    cursorymax = (info.height - 6) / 17;
+    cursorymax = (info.height - 6) / 16;
     clearscreen();
     refreshscreen();
     
