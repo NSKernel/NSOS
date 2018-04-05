@@ -44,7 +44,7 @@ int main() {
   
   initconsole(_device(deviceit));
   printstring("Test\nHello");
-  printstring("Continue testaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+  printstring("Continue testabcdefghijklmnopqrstuvwxyz12345678901234567890");
   return 0;
 }
 
