@@ -45,6 +45,9 @@ int main() {
   initconsole(_device(deviceit));
   printstring("Test\n");
   printstring("abcdefghijklmnopqrstuvwxyz12345678901234567890abcdefghijklmnopqrstuvwxyz12345678901234567890");
+  while (true) {
+      printstring("Hello\n"); 
+  }
   return 0;
 }
 
