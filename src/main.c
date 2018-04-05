@@ -18,6 +18,8 @@ static void pciconf_test(_Device *dev);
 static void ata_test(_Device *dev);
 
 int main() {
+  int deviceit;
+
   if (_ioe_init() != 0) _halt(1);
   printf("_heap = [%08x, %08x)\n", _heap.start, _heap.end);
   for (int n = 1; ; n++) {
@@ -33,7 +35,11 @@ int main() {
     }
     printf("\n");
   }
-  setscreen(_device(_DEV_VIDEO));
+  //_Device *screen;
+  deviceit = 1;
+  while (!_device(deviceit) && _device(deviceit)->id != _DEV_VIDEO)
+      deviceit += 1;
+  setscreen(_device(deviceit));
   printchar('T', 0, 0);
   printchar('e', 1, 0);
   printchar('s', 2, 0);
