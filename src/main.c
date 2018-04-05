@@ -41,14 +41,9 @@ int main() {
       deviceit += 1;
       printf("Device id = %08X %s _DEV_VIDEO\n", (_device(deviceit)->id != _DEV_VIDEO ? "!=" : "=="));
   }
-  printf("Found screen.\n");
-  setscreen(_device(deviceit));
-  printf("Screen set.\n");
-  printchar('T', 0, 0);
-  printf("Printed T.\n");
-  printchar('e', 1, 0);
-  printchar('s', 2, 0);
-  printchar('t', 3, 0);
+  
+  initconsole(_device(deviceit));
+  printstring("Test\nHello");
   return 0;
 }
 
