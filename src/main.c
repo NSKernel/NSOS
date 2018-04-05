@@ -88,7 +88,7 @@ int main() {
                    printstring("]");
                    break;
                  case _KEY_BACKSLASH:
-                   printstring("\");
+                   printstring("\\");
                    break;
                  case _KEY_SEMICONLON:
                    printstring(";");
