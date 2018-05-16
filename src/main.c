@@ -339,9 +339,9 @@ static void ata_test(_Device *dev) {
   }
   printf("Reading out the MBR:\n");
   for (int i = 0; i < SECTSZ / 16 / sizeof(uint16_t); i ++) {
-    for (int j = 0; j < 16; j++) {
+    for (int j = 0; j < 15; j++) {
       printf("%04x ", ((uint16_t *)buf)[i * 16 + j] & 0xffff);
     }
-    printf("\n");
+    printf("%04x\n", ((uint16_t *)buf)[i * 16 + 16] & 0xffff);
   }
 }
