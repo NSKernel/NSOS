@@ -87,6 +87,7 @@ void printcursor(int x, int y) {
 
 void refreshscreen() {
     int i, j;
+    char linefullbackup = linefull;
     
     cursorx = 0;
     cursory = 0;
@@ -101,6 +102,7 @@ void refreshscreen() {
     for (i = 0; i < cursorxmax; i++) {
         printcharpos(' ', i, cursorymax - 1);
     }
+    linefull = linefullbackup;
 }
 
 //
