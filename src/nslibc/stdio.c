@@ -1,7 +1,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <am.h>
-#include <os/console>
+#include <os/console.h>
 
 char printbuf[1024];
 
