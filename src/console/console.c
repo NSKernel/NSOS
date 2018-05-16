@@ -152,8 +152,7 @@ void printchar(char ch) {
     int i;
     
     if (ch == '\n') {
-        if (linefull) {
-            linefull = 0;
+        if (!linefull) {
             printcharpos(ch, cursorx, cursory);
             cursorx = 0;
             if (cursory == cursorymax - 1) { 
@@ -167,6 +166,8 @@ void printchar(char ch) {
                 cursory += 1;
             }
         }
+        else
+            linefull = 0;
     }
     else {
         linefull = 0;
