@@ -12,6 +12,7 @@ static unsigned int cursory;
 static unsigned int cursorxmax;
 static unsigned int cursorymax;
 static char cursoron;
+static char linefull;
 
 static char screenbuf[200][200];
 static unsigned char linestart;
@@ -122,6 +123,7 @@ void initconsole(_Device *dev) {
     cursorx = 0;
     cursory = 0;
     cursoron = 1;
+    linefull = 0;
     
     printcursor(0, 0);
     
@@ -150,23 +152,28 @@ void printchar(char ch) {
     int i;
     
     if (ch == '\n') {
-        printcharpos(ch, cursorx, cursory);
-        cursorx = 0;
-        if (cursory == cursorymax - 1) { 
-            for (i = 0; i < cursorxmax; i++) {
-                screenbuf[(linestart + cursory + 1) % cursorymax][i] = ' ';
+        if (linefull) {
+            linefull = 0;
+            printcharpos(ch, cursorx, cursory);
+            cursorx = 0;
+            if (cursory == cursorymax - 1) { 
+                for (i = 0; i < cursorxmax; i++) {
+                    screenbuf[(linestart + cursory + 1) % cursorymax][i] = ' ';
+                }
+                linestart = (linestart + 1) % cursorymax;
+                refreshscreen();
             }
-            linestart = (linestart + 1) % cursorymax;
-            refreshscreen();
-        }
-        else {
-            cursory += 1;
+            else {
+                cursory += 1;
+            }
         }
     }
     else {
+        linefull = 0;
         printcharpos(ch, cursorx, cursory);
         screenbuf[(cursory + linestart) % cursorymax][cursorx] = ch;
         if (cursorx == cursorxmax - 1) { // new line
+            linefull = 1;
             cursorx = 0;
             if (cursory == cursorymax - 1) {
                 for (i = 0; i < cursorxmax; i++) {
