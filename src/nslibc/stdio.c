@@ -1,12 +1,12 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <am.h>
-#include <os/console.h>
 
-char printbuf[1024];
+#include <os/console.h>
 
 int printf(const char *fmt, ...) {
     va_list args;
+    char printbuf[1024];
     int i;
     int j = 0;
     
