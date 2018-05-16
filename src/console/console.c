@@ -170,7 +170,6 @@ void printchar(char ch) {
             linefull = 0;
     }
     else {
-        linefull = 0;
         printcharpos(ch, cursorx, cursory);
         screenbuf[(cursory + linestart) % cursorymax][cursorx] = ch;
         if (cursorx == cursorxmax - 1) { // new line
@@ -188,6 +187,7 @@ void printchar(char ch) {
             }
         }
         else {
+            linefull = 0;
             cursorx += 1;
         }
     }
