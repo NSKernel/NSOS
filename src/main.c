@@ -38,6 +38,14 @@ int main() {
   RShiftDown = 0;
 
   if (_ioe_init() != 0) _halt(1);
+  
+  
+  deviceit = 1;
+  while (_device(deviceit) && _device(deviceit)->id != _DEV_VIDEO) {
+      deviceit += 1;
+  }
+  initconsole(_device(deviceit));
+  
   printf("_heap = [%08x, %08x)\n", _heap.start, _heap.end);
   for (int n = 1; ; n++) {
     _Device *dev = _device(n);
@@ -58,12 +66,7 @@ int main() {
       ASCIITable[i - 'A'][0] = i;
       ASCIITable[i - 'A'][1] = i + 'a' - 'A';
   }
-  deviceit = 1;
-  while (_device(deviceit) && _device(deviceit)->id != _DEV_VIDEO) {
-      deviceit += 1;
-  }
   
-  initconsole(_device(deviceit));
   printstring("NS/OS 0 Console Test Space\nCopyright (C) 2018 NSKernel. All rights reserved\n\nYou may Type anything and it will show on the screen.\nBackspace is NOT AVAILABLE.\n\n");
   
   //_Device *screen;

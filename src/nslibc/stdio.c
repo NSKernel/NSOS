@@ -1,6 +1,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <am.h>
+#include <os/console>
 
 char printbuf[1024];
 
@@ -14,8 +15,10 @@ int printf(const char *fmt, ...) {
     //_putc('T');
     //_putc('0' + i);
     //_putc('\n');
-    for (j = 0; j < i; j++)
+    for (j = 0; j < i; j++) {
         _putc(printbuf[j]);
+        printchar(printbuf[j]);
+    }
     va_end(args);
     return i;
 }
