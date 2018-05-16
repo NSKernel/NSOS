@@ -67,7 +67,7 @@ int main() {
       ASCIITable[i - 'A'][1] = i + 'a' - 'A';
   }
   
-  printstring("NS/OS 0 Console Test Space\nCopyright (C) 2018 NSKernel. All rights reserved\n\nYou may Type anything and it will show on the screen.\nBackspace is NOT AVAILABLE.\n\n");
+  printstring("NS/OS 0 Console Test Space\nCopyright (C) 2018 NSKernel. All rights reserved.\n\nYou may Type anything and it will show on the screen.\nBackspace is NOT AVAILABLE.\n\n");
   
   //_Device *screen;
   deviceit = 1;
