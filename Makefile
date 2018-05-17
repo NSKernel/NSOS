@@ -1,9 +1,9 @@
 CFLAGS  = -std=c99 -O2 -MMD -Wall -Werror -ggdb -fno-builtin \
           -fno-pic -fno-stack-protector -fno-omit-frame-pointer \
-          -m32 -march=i386 -I./include
+          -m32 -march=i386 -I./include -I./framework -I./am
 LDFLAGS = -melf_i386 -Ttext 0x00100000 
 
-SRCS = $(shell find src -name "*.c")
+SRCS = $(shell find src -name "*.c") $(shell find unit_test -name "*.c") framework/main.c
 OBJS = $(addprefix build/, $(addsuffix .o, $(basename $(SRCS))))
 DEPS = $(addprefix build/, $(addsuffix .d, $(basename $(SRCS))))
 
@@ -16,11 +16,7 @@ run: build/os.img
 	qemu-system-i386 -serial stdio $<
 
 clean:
-	rm -rf build/*
-
-submit:
-	cd .. && tar cj oslab0 > submission.tar.bz2
-	curl -F "task=L0" -F "id=$(STUID)" -F "name=$(STUNAME)" -F "submission=@../submission.tar.bz2" 114.212.81.90:5000/upload
+	rm -rf build 
 
 build/kernel: $(OBJS)
 	ld $(LDFLAGS) -o $@ $(OBJS) am/am-x86-qemu.a

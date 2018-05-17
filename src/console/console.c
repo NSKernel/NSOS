@@ -1,8 +1,11 @@
 #include <am.h>
 #include <amdev.h>
 #include <stdio.h>
+#include <simple_lock.h>
 
 extern unsigned char iso_font[256*16];
+
+static spinlock_t console_lock;
 
 static _Device *consolescreen;
 static unsigned int screenwidth;
@@ -25,6 +28,8 @@ void clearscreen() {
     _FBCtlReg ctl;
     uint32_t pixel = 0x00000000;
     
+    simple_lock_try(&console_lock);
+    
     for (i = 0; i < cursorymax; i++) {
         for (j = 0; j < cursorxmax; j++) {
             screenbuf[i][j] = ' ';
@@ -45,6 +50,8 @@ void clearscreen() {
             consolescreen->write(_DEVREG_VIDEO_FBCTL, &ctl, sizeof(ctl));
         }
     }
+    
+    simple_lock_unlock(&console_lock);
 }
 
 // Print a char to the specific position on screen
@@ -87,27 +94,20 @@ void printcursor(int x, int y) {
 
 void refreshscreen() {
     int i, j;
-    char linefullbackup = linefull;
     
-    cursorx = 0;
-    cursory = 0;
-    for (i = 0; i < cursorymax - 1; i++) {
+    for (i = 0; i < cursorymax; i++) {
         for (j = 0; j < cursorxmax; j++) {
             cursoron = 0;
-            printchar(screenbuf[(linestart + i) % cursorymax][j]);
+            printcharpos(screenbuf[(linestart + i) % cursorymax][j], j, i);
             cursoron = 1;
         }
-        //printstring(screenbuf[(linestart + i) % cursorymax]);
     }
-    for (i = 0; i < cursorxmax; i++) {
-        printcharpos(' ', i, cursorymax - 1);
-    }
-    linefull = linefullbackup;
 }
 
-//
 void initconsole(_Device *dev) {
     _VideoInfoReg info;
+    
+    simple_lock_init(&console_lock, "console_lock");
     
     dev->read(_DEVREG_VIDEO_INFO, &info, sizeof(info));
     screenwidth = info.width;
@@ -128,8 +128,6 @@ void initconsole(_Device *dev) {
     linefull = 0;
     
     printcursor(0, 0);
-    
-    printf("Screen device id is %08X\n", dev->id);
 }
 
 void setcursor(unsigned int x, unsigned int y, char on) {
@@ -152,6 +150,8 @@ char getcursoron() {
 
 void printchar(char ch) {
     int i;
+    
+    simple_lock_try(&console_lock);
     
     if (ch == '\n') {
         if (!linefull) {
@@ -195,6 +195,8 @@ void printchar(char ch) {
     }
     if (cursoron)
         printcursor(cursorx, cursory);
+        
+    simple_lock_unlock(&console_lock);
 }
 
 void printstring(char *buf) {
