@@ -61,7 +61,11 @@ static _RegSet *os_interrupt(_Event ev, _RegSet *regs) {
   _Device *KeyboardDevice = _device(deviceit);
   _KbdReg KeyboardRegister;
 
+<<<<<<< HEAD
   if (ev.event == _EVENT_IRQ_TIMER || ev.event == _EVENT_YIELD) {
+=======
+  if (ev.event == _EVENT_IRQ_TIMER) {
+>>>>>>> c847ab37756d247a5ab39008f0fe003db843204e
       if (current_thread != NULL) {
           current_thread->status = regs;
       }
