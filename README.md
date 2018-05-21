@@ -10,4 +10,4 @@ NS/OS 0 is not finished yet and is still on the go. Now the system gets to it's 
 
 A [wiki](https://github.com/NSKernel/NSOS/wiki) is provided to help you build, use and even hack the NS/OS
 
-NS/OS 0 uses various opensource components. vsprintf.c comes from Linux kernel, iso_font.c comes from .
+NS/OS 0 uses various opensource components. vsprintf.c comes from Linux kernel, iso_font.c comes from Darwin kernel.
