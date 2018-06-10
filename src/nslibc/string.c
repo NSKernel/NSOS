@@ -9,7 +9,7 @@ void *memset(void *b, int c, size_t n) {
     return b;
 }
 
-void *memcpy(void *dest, const void *src, size_t n) {
+void *memcpy(void *dest, const void *src, int n) {
     char *DEST = (char*)dest;
     char *SRC = (char*)src;
     while (--n >= 0) {

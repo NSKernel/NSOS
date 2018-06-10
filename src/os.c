@@ -5,10 +5,9 @@
 
 #include <amdev.h>
 #include <kmt.h>
+#include <vfs.h>
+#include <kvfs.h>
 #include <unittest.h>
-
-
-static thread_t *current_thread;
 
 static void os_init();
 static void os_run();
@@ -29,29 +28,40 @@ static void os_init() {
     
     syslog(NULL, "NSOS/0 Version %s. Compiled with GCC %s at %s on %s.", "0.1", __VERSION__, __TIME__, __DATE__);
     syslog(NULL, "Initializing OS...");
-    current_thread = NULL;
+    current = NULL;
     syslog(NULL, "OS initialization is done.");
 }
 
 static void os_run() {
-  
-  // launchd
-  //kmt->create(&launchd_thread, launchd, NULL);
+    int i;
+    // launchd
+    //kmt->create(&launchd_thread, launchd, NULL);
     
-  thread_pool[1] = &launchd_thread;
-  thread_pool[1]->stack.start = (void*)launchd_stack + sizeof(uint8_t);
-  thread_pool[1]->stack.end = thread_pool[1]->stack.start + STACK_SIZE;
-  *(uint8_t*)(thread_pool[1]->stack.start - sizeof(uint8_t)) = STACK_MAGIC;
-  *(uint8_t*)(thread_pool[1]->stack.end) = STACK_MAGIC;
-  thread_pool[1]->sleep = 0;
-  thread_pool[1]->current_waiting = NULL;
-  thread_pool[1]->status = _make(thread_pool[1]->stack, launchd, NULL);
-  syslog("OS", "launchd at 0x%08X stack starts from 0x%08X to 0x%08X", thread_pool[1], thread_pool[1]->stack.start, thread_pool[1]->stack.end);
+    thread_pool[1] = &launchd_thread;
+    thread_pool[1]->stack.start = (void*)launchd_stack + sizeof(uint8_t);
+    thread_pool[1]->stack.end = thread_pool[1]->stack.start + STACK_SIZE;
+    *(uint8_t*)(thread_pool[1]->stack.start - sizeof(uint8_t)) = STACK_MAGIC;
+    *(uint8_t*)(thread_pool[1]->stack.end) = STACK_MAGIC;
+    thread_pool[1]->sleep = 0;
+    thread_pool[1]->current_waiting = NULL;
+    thread_pool[1]->status = _make(thread_pool[1]->stack, launchd, NULL);
+    thread_pool[1]->fs.root = root_dentry;
+    thread_pool[1]->fs.pwd = root_dentry;
+    thread_pool[1]->fs.altroot = root_dentry;
+    thread_pool[1]->fs.rootmnt = &root_mnt;
+    thread_pool[1]->fs.pwdmnt = &root_mnt;
+    thread_pool[1]->fs.altrootmnt = &root_mnt;
+    
+    for (i = 0; i < MAX_FILE_PER_THREAD; i++) {
+        thread_pool[1]->file_descriptors[i] = NULL;
+    }
+    
+    syslog("OS", "launchd at 0x%08X stack starts from 0x%08X to 0x%08X", thread_pool[1], thread_pool[1]->stack.start, thread_pool[1]->stack.end);
   
-  _intr_write(1); // enable interrupt
+    _intr_write(1); // enable interrupt
   
   
-  while (1) ; // should never return
+    while (1) ; // should never return
 }
 
 static _RegSet *os_interrupt(_Event ev, _RegSet *regs) {
@@ -62,12 +72,12 @@ static _RegSet *os_interrupt(_Event ev, _RegSet *regs) {
   _KbdReg KeyboardRegister;
 
   if (ev.event == _EVENT_IRQ_TIMER || ev.event == _EVENT_YIELD) {
-      if (current_thread != NULL) {
-          current_thread->status = regs;
+      if (current != NULL) {
+          current->status = regs;
       }
-      current_thread = kmt->schedule();
+      current = kmt->schedule();
       
-      return current_thread->status;
+      return current->status;
   }
   if (ev.event == _EVENT_IRQ_IODEV) {
       // syslog("INTERRUPT", "Device I/O interrupt");

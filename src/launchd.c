@@ -13,7 +13,7 @@ void launchd(void *x) {
     //#ifdef UNIT_TEST
     key_action = 0;
     syslog("launchd", "Press enter to start unit test");
-    while (key_action == 0);
+    /*while (key_action == 0);
     pmm_test();
     key_action = 0;
     syslog("launchd", "PMM test is completed. Press enter to continue");
@@ -23,6 +23,10 @@ void launchd(void *x) {
     syslog("launchd", "KMT test is completed. Press enter to continue");
     while (key_action == 0);
     sem_test();
+    syslog("launchd", "SEM test is completed. Press enter to continue");
+    */
+    while (key_action == 0);
+    vfs_test();
     
     syslog("launchd", "test complete");
     //#endif

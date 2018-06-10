@@ -63,7 +63,7 @@ int kmt_create(thread_t *thread, void (*entry)(void *arg), void *arg) {
     
     thread_pool[i] = thread;
     
-    
+    thread->id = i;
     thread->stack.start = pmm->alloc(STACK_SIZE + 2 * sizeof(uint8_t)) + sizeof(uint8_t);
     thread->stack.end = thread->stack.start + STACK_SIZE;
     *(uint8_t*)(thread->stack.start - sizeof(uint8_t)) = STACK_MAGIC; // fence
@@ -71,6 +71,22 @@ int kmt_create(thread_t *thread, void (*entry)(void *arg), void *arg) {
     thread->sleep = 0;
     thread->current_waiting = NULL;
     thread->status = _make(thread->stack, entry, arg);
+    thread->uid = 0; // kernel threads are root!
+    thread->gid = 0; // kernel threads are root!
+    
+    thread->fs.root = current->fs.root;
+    thread->fs.pwd = current->fs.pwd;
+    thread->fs.altroot = current->fs.altroot;
+    thread->fs.rootmnt = current->fs.rootmnt;
+    thread->fs.pwdmnt = current->fs.pwdmnt;
+    thread->fs.altrootmnt = current->fs.altrootmnt;
+    
+    for (i = 0; i < MAX_FILE_PER_THREAD; i++) {
+        thread->file_descriptors[i] = NULL;
+    }
+    
+    syslog("KMT", "Created kernel thread with stack from 0x%08X to 0x%08X", thread->stack.start, thread->stack.end);
+    
     kmt_spin_unlock(&thread_lock);
     return 0;
 }
