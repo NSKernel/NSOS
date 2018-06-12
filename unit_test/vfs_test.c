@@ -19,6 +19,7 @@ void do_tracefile(struct dentry *dentry) {
                     dentry = mntit->mnt_mountpoint;
                     break;
                 }
+                mntit = mntit->mnt_next;
             }
             if (mntit == NULL || dentry->d_mounted == 0) {
                 syslog("VFS_TEST", "Mount issue! FS implementation has a bug!");
@@ -237,6 +238,7 @@ void vfs_test_proc() {
     vfs_test_buf[readcount] = '\0';
     syslog("VFS_TEST", "%d bytes read. Data is: ", readcount);
     printf("%s", vfs_test_buf);
+    vfs->close(fd1);
     
     syslog("VFS_TEST", "Press enter to continue\n");
     press_enter_to_continue();
@@ -250,6 +252,7 @@ void vfs_test_proc() {
     vfs_test_buf[readcount] = '\0';
     syslog("VFS_TEST", "%d bytes read. Data is: ", readcount);
     printf("%s", vfs_test_buf);
+    vfs->close(fd2);
     
     syslog("VFS_TEST", "Press enter to continue\n");
     press_enter_to_continue();
@@ -357,6 +360,62 @@ void vfs_test_proc() {
     syslog("VFS_TEST", "proc test is completed...");
 }
 
+void vfs_test_devfs() {
+    int fd1, fd2, fd3, readcount;
+    
+    syslog("VFS_TEST", "Now testing devfs...");
+    
+    
+    syslog("VFS_TEST", "Opening \"/dev/null\"");
+    fd1 = vfs->open("/dev/null", O_RDONLY);
+    syslog("VFS_TEST", "Traced path of the file is");
+    tracefile(fd1);
+    syslog("VFS_TEST", "Reading out data from \"/dev/null\"");
+    readcount = vfs->read(fd1, vfs_test_buf, 100);
+    vfs_test_buf[readcount] = '\0';
+    syslog("VFS_TEST", "%d bytes read. Data is: ", readcount);
+    printf("%s", vfs_test_buf);
+    
+    syslog("VFS_TEST", "Press enter to continue\n");
+    press_enter_to_continue();
+    
+    syslog("VFS_TEST", "Opening \"/dev/zero\"");
+    fd2 = vfs->open("/dev/zero", O_RDONLY);
+    syslog("VFS_TEST", "Traced path of the file is");
+    tracefile(fd2);
+    syslog("VFS_TEST", "Reading out 100 bytes from \"/dev/zero\"");
+    readcount = vfs->read(fd2, vfs_test_buf, 100);
+    vfs_test_buf[readcount] = '\0';
+    syslog("VFS_TEST", "%d bytes read. Data in hex is: ", readcount);
+    while (readcount--) {
+        printf("%02X", vfs_test_buf[readcount]);
+    }
+    printf("\n");
+    
+    syslog("VFS_TEST", "Press enter to continue\n");
+    press_enter_to_continue();
+    
+    syslog("VFS_TEST", "Opening \"/dev/random\"");
+    fd3 = vfs->open("/dev/random", O_RDONLY);
+    syslog("VFS_TEST", "Traced path of the file is");
+    tracefile(fd3);
+    syslog("VFS_TEST", "Reading out 100 bytes from \"/dev/random\"");
+    readcount = vfs->read(fd3, vfs_test_buf, 100);
+    vfs_test_buf[readcount] = '\0';
+    syslog("VFS_TEST", "%d bytes read. Data is: ", readcount);
+    while (readcount--) {
+        printf("%01X", vfs_test_buf[readcount]);
+    }
+    printf("\n");
+    
+    
+    vfs->close(fd1);
+    vfs->close(fd2);
+    vfs->close(fd3);
+    
+    syslog("VFS_TEST", "devfs test is completed...");
+}
+
 void vfs_test_multithread_one_file() {
     int fd, readcount = 0;
     syslog("VFS_TEST", "Now performing opening and writing one file from multiple threads...");
@@ -435,6 +494,11 @@ void vfs_test() {
     press_enter_to_continue();
     
     vfs_test_proc();
+    
+    syslog("VFS_TEST", "Press enter to continue\n");
+    press_enter_to_continue();
+    
+    vfs_test_devfs();
     
     syslog("VFS_TEST", "Press enter to continue\n");
     press_enter_to_continue();

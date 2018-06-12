@@ -3,6 +3,7 @@
 
 #include <kmt.h>
 #include <procfs.h>
+#include <devfs.h>
 
 //#ifdef UNIT_TEST
 #include <unittest.h>
@@ -21,6 +22,17 @@ void launchd(void *x) {
     }
     
     syslog("launchd", "proc is mounted");
+    
+    syslog("launchd", "mounting udev to /dev...");
+    
+    // mount profs
+    vfs->mkdir("/dev", 0x0666); // no matter if it exists, we first *try* make the dir
+    if (vfs->mount("/dev", devfs)) {
+        syslog("launchd", "failed to mount udev");
+        panic("Failed to mount udev");
+    }
+    
+    syslog("launchd", "udev is mounted");
     
     //#ifdef UNIT_TEST
     key_action = 0;

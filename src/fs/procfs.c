@@ -81,7 +81,7 @@ struct inode *proc_alloc_inode(struct file_system_type *fs) {
     
     retinode->i_op = proc_inode_operations;
     retinode->i_fop = proc_file_operations;
-    // the kvfs is unique and uses device ramdisk0, and in fact the inodes are not actually managed by the fs
+    // the procfs is unique and uses device proc, and in fact the inodes are not actually managed by the fs
     return retinode;
 }
 
