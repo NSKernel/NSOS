@@ -8,7 +8,7 @@ void print_memory_layout() {
     struct memory_block *blockit = memory_head;
     uint32_t count = 0;
     printf("\n           blockit    front      next       in use\n");
-    while ((void*)(blockit) != _heap.end && count < 30) {
+    while ((void*)(blockit) != _heap.end && count < 100) {
         printf("block %3d: 0x%08X 0x%08X 0x%08X %s\n", count, blockit, blockit->front, blockit->next, (blockit->inuse ? "yes" : "no"));
         count += 1;
         blockit = blockit->next;

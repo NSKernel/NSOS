@@ -17,7 +17,7 @@ struct file_system_type {
     const char *name;
     
     struct file_system_type *next;
-    const char *dev;
+    char *dev;
     struct dentry *(*mount)(struct file_system_type *fs, const char *source, void *data);
     struct super_operations *sop;
     struct dentry_operations *dop;

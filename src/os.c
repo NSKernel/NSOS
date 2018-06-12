@@ -6,7 +6,7 @@
 #include <amdev.h>
 #include <kmt.h>
 #include <vfs.h>
-#include <kvfs.h>
+#include <procfs.h>
 #include <unittest.h>
 
 static void os_init();
@@ -34,6 +34,7 @@ static void os_init() {
 
 static void os_run() {
     int i;
+    
     // launchd
     //kmt->create(&launchd_thread, launchd, NULL);
     
@@ -43,6 +44,7 @@ static void os_run() {
     *(uint8_t*)(thread_pool[1]->stack.start - sizeof(uint8_t)) = STACK_MAGIC;
     *(uint8_t*)(thread_pool[1]->stack.end) = STACK_MAGIC;
     thread_pool[1]->sleep = 0;
+    thread_pool[1]->name = "launchd";
     thread_pool[1]->current_waiting = NULL;
     thread_pool[1]->status = _make(thread_pool[1]->stack, launchd, NULL);
     thread_pool[1]->fs.root = root_dentry;
@@ -52,9 +54,12 @@ static void os_run() {
     thread_pool[1]->fs.pwdmnt = &root_mnt;
     thread_pool[1]->fs.altrootmnt = &root_mnt;
     
-    for (i = 0; i < MAX_FILE_PER_THREAD; i++) {
+    for (i = 3; i < MAX_FILE_PER_THREAD; i++) {
         thread_pool[1]->file_descriptors[i] = NULL;
     }
+    thread_pool[1]->file_descriptors[STDIN_FILENO] = NULL + 1; // can be anything but not NULL
+    thread_pool[1]->file_descriptors[STDOUT_FILENO] = NULL + 1; // can be anything but not NULL
+    thread_pool[1]->file_descriptors[STDERR_FILENO] = NULL + 1; // can be anything but not NULL
     
     syslog("OS", "launchd at 0x%08X stack starts from 0x%08X to 0x%08X", thread_pool[1], thread_pool[1]->stack.start, thread_pool[1]->stack.end);
   

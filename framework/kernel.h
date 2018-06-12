@@ -46,6 +46,8 @@ MODULE {
     ssize_t (*write)(int fd, void *buf, size_t nbyte);
     off_t (*lseek)(int fd, off_t offset, int whence);
     int (*close)(int fd);
+    
+    int (*mkdir)(const char *path, unsigned short mode);
 } MOD_NAME(vfs);
 
 #endif

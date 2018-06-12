@@ -81,9 +81,13 @@ int kmt_create(thread_t *thread, void (*entry)(void *arg), void *arg) {
     thread->fs.pwdmnt = current->fs.pwdmnt;
     thread->fs.altrootmnt = current->fs.altrootmnt;
     
-    for (i = 0; i < MAX_FILE_PER_THREAD; i++) {
+    
+    for (i = 3; i < MAX_FILE_PER_THREAD; i++) {
         thread->file_descriptors[i] = NULL;
     }
+    thread->file_descriptors[STDIN_FILENO] = NULL + 1; // can be anything but not NULL
+    thread->file_descriptors[STDOUT_FILENO] = NULL + 1; // can be anything but not NULL
+    thread->file_descriptors[STDERR_FILENO] = NULL + 1; // can be anything but not NULL
     
     syslog("KMT", "Created kernel thread with stack from 0x%08X to 0x%08X", thread->stack.start, thread->stack.end);
     

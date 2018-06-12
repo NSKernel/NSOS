@@ -6,7 +6,9 @@
 #include <os/syslog.h>
 
 
-#define KVFS_MAX_FILE 256
+#define KVFS_MAX_FILE 1024
+
+static char kvfs_inited = 0;
 
 struct dentry *kvfs_mount(struct file_system_type *fs, const char *source, void *data);
 
@@ -43,7 +45,8 @@ static struct kvfs_file_node kvfs_files[KVFS_MAX_FILE];
 
 struct super_operations kvfs_super_operations_obj = {
     .alloc_inode = kvfs_alloc_inode,
-    .destroy_inode = kvfs_destroy_inode
+    .destroy_inode = kvfs_destroy_inode,
+    .umount_begin = NULL
 };
 struct super_operations *kvfs_super_operations = &kvfs_super_operations_obj;
 
@@ -247,13 +250,21 @@ ssize_t kvfs_write(struct file *fp, char *buf, size_t count) {
 }
 
 struct dentry *kvfs_mount(struct file_system_type *fs, const char *source, void *data) {
+    if (strncmp(source, "ramdisk", strlen("ramdisk"))) {
+        return NULL;
+    }
+    if (source[strlen("ramdisk")] - '0' < 0 || source[strlen("ramdisk")] - '0' > 9) {
+        return NULL;
+    }
+    
+    
     struct inode *ip = pmm->alloc(sizeof(struct inode));
     struct dentry *dentry = pmm->alloc(sizeof(struct dentry));
     int i;
     
     ip->i_uid = 0;
     ip->i_gid = 0;
-    ip->i_acl = 0x777;
+    ip->i_acl = 0x755;
     ip->i_ino = -1;
     ip->i_op = kvfs_inode_operations;
     ip->i_fop = NULL;
@@ -263,16 +274,21 @@ struct dentry *kvfs_mount(struct file_system_type *fs, const char *source, void 
     dentry->d_inode = ip;
     dentry->d_parent = dentry;
     dentry->d_subdirs = NULL;
-    dentry->d_mounted = 0; // though kvfs is mounted to root, we considered it as a special kind of mounting
+    dentry->d_mounted = 0;
     dentry->d_isdir = 1;
     dentry->d_op = kvfs_dentry_operations;
     
     fs->next = NULL;
+    fs->dev = pmm->alloc(strlen(source) + 1);
+    strncpy(fs->dev, source, strlen(source) + 1);
     
-    for (i = 0; i < KVFS_MAX_FILE; i++) {
-        kvfs_files[i].inuse = 0;
-        kvfs_files[i].start = NULL;
-        kvfs_files[i].end = NULL;
+    if (!kvfs_inited) {
+        for (i = 0; i < KVFS_MAX_FILE; i++) {
+            kvfs_files[i].inuse = 0;
+            kvfs_files[i].start = NULL;
+            kvfs_files[i].end = NULL;
+        }
+        kvfs_inited = 1;
     }
     
     return dentry;

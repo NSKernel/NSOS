@@ -22,6 +22,7 @@ spinlock_t semaphore_lock;
 
 struct thread {
     int32_t id;
+    char *name;
     _RegSet *status;
     volatile char sleep;
     sem_t *current_waiting;

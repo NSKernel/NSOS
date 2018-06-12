@@ -53,6 +53,9 @@ struct dentry *path_lookup(const char *name, unsigned int flags, struct nameidat
                 follow_dotdot(nd);
                 /* fall through */
               case 1:
+                if (!*name) { // if last part
+                    return nd->dentry;
+                }
                 continue;
             }
         }
@@ -77,7 +80,7 @@ struct dentry *path_lookup(const char *name, unsigned int flags, struct nameidat
     }
 }
 
-struct dentry *make_path_file(const char *name, struct nameidata *nd) { // the path needs to be a directory
+struct dentry *make_path(const char *name, unsigned int flags, struct nameidata *nd, unsigned short mode) { // the path needs to be a directory
     const char *namestart;
     char last_part = 0;
     int namelen;
@@ -99,6 +102,8 @@ struct dentry *make_path_file(const char *name, struct nameidata *nd) { // the p
         name++;
             
     if (*name == '\0') { // the whole path is ////////...////, still a path
+        if (flags & LOOKUP_DIRECTORY)
+            return nd->dentry;
         return NULL;
     }
     
@@ -113,7 +118,8 @@ struct dentry *make_path_file(const char *name, struct nameidata *nd) { // the p
         if (*name) {
             while (*++name == '/');
             if (!*name && *(name - 1) == '/') // making a path
-                return NULL;
+                if (!(flags & LOOKUP_DIRECTORY))
+                    return NULL;
         }
         if (!*name) {
             last_part = 1;
@@ -130,8 +136,12 @@ struct dentry *make_path_file(const char *name, struct nameidata *nd) { // the p
                 follow_dotdot(nd);
                 /* fall through */
               case 1:
-                if (last_part)
-                    return NULL; // a path
+                if (last_part) {
+                    if (!(flags & LOOKUP_DIRECTORY))
+                        return NULL; // a path
+                    else
+                        return nd->dentry;
+                }
                 continue;
             }
         }
@@ -144,7 +154,7 @@ struct dentry *make_path_file(const char *name, struct nameidata *nd) { // the p
             newinode = nd->mnt->mnt_fs->sop->alloc_inode(nd->mnt->mnt_fs);
             newinode->i_uid = current->uid;
             newinode->i_gid = current->gid;
-            newinode->i_acl = ACL_DEFAULT;
+            newinode->i_acl = mode;
             newinode->i_op = nd->mnt->mnt_fs->iop; 
             
             newdentry = pmm->alloc(sizeof(struct dentry));
@@ -159,7 +169,7 @@ struct dentry *make_path_file(const char *name, struct nameidata *nd) { // the p
             newdentry->d_mounted = 0;
             newdentry->d_op = nd->mnt->mnt_fs->dop;
             
-            if (last_part) { // make a file
+            if (last_part && !(flags & LOOKUP_DIRECTORY)) { // make a file
                 if (newinode->i_op->create(newinode, newdentry)) {
                     syslog("VFS", "failed to create a file inode in create");
                     nd->mnt->mnt_fs->sop->destroy_inode(newinode);
@@ -184,6 +194,7 @@ struct dentry *make_path_file(const char *name, struct nameidata *nd) { // the p
         
         if (*name) {
             // but we do need to make sure that nd->dentry is a dir
+            // if we are still going to create subdirs for it
             if (nd->dentry->d_isdir)
                 continue;
             else
@@ -191,8 +202,11 @@ struct dentry *make_path_file(const char *name, struct nameidata *nd) { // the p
         }
         
         // no more chars in name
-        if (nd->dentry->d_isdir) // *found* a dir: make will ensure it makes a file
+        if (nd->dentry->d_isdir && !(flags & LOOKUP_DIRECTORY)) // *found* a dir but required to makeup a file
             return NULL;
+        if (!nd->dentry->d_isdir && (flags & LOOKUP_DIRECTORY)) // *found* a file but required to makeup a dir
+            return NULL;
+        
         return nd->dentry;
     }
 }
@@ -212,19 +226,7 @@ void follow_dotdot(struct nameidata *nd) {
 int do_lookup(struct nameidata *nd, const char *name, int namelen) {
     struct vfsmount *mntit = mnt_head;
     struct dentry *denit;
-    
-    
-    if (nd->dentry->d_mounted) { // if mounted
-        while (mntit != NULL && mntit->mnt_mountpoint != nd->dentry) // pick the last mounted fs
-            mntit = mntit->mnt_next;
-        if (mntit == NULL) {
-            syslog("VFS", "path lookup failed in follow_dotdot. mount issue.");
-            panic("VFS found a mount issue");
-        }
-        
-        nd->dentry = mntit->mnt_root;
-        nd->mnt = mntit;
-    }
+    struct inode *newinode;
     
     denit = nd->dentry->d_subdirs;
     
@@ -236,6 +238,18 @@ int do_lookup(struct nameidata *nd, const char *name, int namelen) {
         else {
             if (denit->d_op->d_revalidate != NULL || !denit->d_op->d_revalidate(denit)) { // revalidate if the dentry is still valid. if no revalidate function avaliable, regard as always valid
                 nd->dentry = denit;
+                // found. now check if it is a mount point
+                if (nd->dentry->d_isdir && nd->dentry->d_mounted) { // if mounted
+                    while (mntit != NULL && mntit->mnt_mountpoint != nd->dentry) // pick the last mounted fs
+                         mntit = mntit->mnt_next;
+                     if (mntit == NULL) {
+                         syslog("VFS", "path lookup failed in follow_dotdot. mount issue.");
+                         panic("VFS found a mount issue");
+                     }
+    
+                     nd->dentry = mntit->mnt_root;
+                     nd->mnt = mntit;
+                }
                 return 0;
             }
             else { // the dentry is found but is not valid. drop it and use slower lookup
@@ -256,8 +270,9 @@ int do_lookup(struct nameidata *nd, const char *name, int namelen) {
         denit->d_subdirs = NULL;
         denit->d_mounted = 0;
         denit->d_op = nd->mnt->mnt_fs->dop;
+        newinode = nd->mnt->mnt_fs->sop->alloc_inode(nd->mnt->mnt_fs);
         
-        if (nd->dentry->d_inode->i_op->lookup(nd->dentry->d_inode, denit) != NULL) {
+        if (nd->dentry->d_inode->i_op->lookup(newinode, denit) != NULL) {
             denit->d_child = nd->dentry->d_subdirs;
             nd->dentry->d_subdirs = denit;
             nd->dentry = denit;

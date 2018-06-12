@@ -5,6 +5,5 @@
 #include <vfs.h>
 
 struct dentry *path_lookup(const char *name, unsigned int flags, struct nameidata *nd);
-struct dentry *make_path_file(const char *name, struct nameidata *nd);
-
+struct dentry *make_path(const char *name, unsigned int flags, struct nameidata *nd, unsigned short mode);
 #endif

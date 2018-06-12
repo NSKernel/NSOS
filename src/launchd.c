@@ -2,6 +2,7 @@
 #include <os/syslog.h>
 
 #include <kmt.h>
+#include <procfs.h>
 
 //#ifdef UNIT_TEST
 #include <unittest.h>
@@ -9,6 +10,17 @@
 
 void launchd(void *x) {
     syslog("launchd", "launchd is now running");
+    
+    syslog("launchd", "mounting proc to /proc...");
+    
+    // mount profs
+    vfs->mkdir("/proc", 0x0664); // no matter if it exists, we first *try* make the dir
+    if (vfs->mount("/proc", procfs)) {
+        syslog("launchd", "failed to mount proc");
+        panic("Failed to mount proc");
+    }
+    
+    syslog("launchd", "proc is mounted");
     
     //#ifdef UNIT_TEST
     key_action = 0;

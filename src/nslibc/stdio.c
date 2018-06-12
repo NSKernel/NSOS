@@ -6,7 +6,7 @@
 
 int printf(const char *fmt, ...) {
     va_list args;
-    char printbuf[1024];
+    char printbuf[5024];
     int i;
     int j = 0;
     

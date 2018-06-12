@@ -3,6 +3,7 @@
 #include <vfs.h>
 #include <path.h>
 #include <kvfs.h>
+#include <procfs.h>
 #include <string.h>
 #include <simple_lock.h>
 #include <os/syslog.h>
@@ -17,6 +18,7 @@ ssize_t vfs_write(int fd, void *buf, size_t nbyte);
 off_t vfs_lseek(int fd, off_t offset, int whence);
 int vfs_close(int fd);
 void vfs_register_filesystem(filesystem_t *fs);
+int vfs_mkdir(const char *path, unsigned short mode);
 
 MOD_DEF(vfs) {
     .init = vfs_init,
@@ -28,17 +30,23 @@ MOD_DEF(vfs) {
     .write = vfs_write,
     .lseek = vfs_lseek,
     .close = vfs_close,
+    .mkdir = vfs_mkdir
 };
 
 void vfs_init() {
-    syslog("VFS", "Initializing VFS...");
+    syslog("VFS", "Initializing VFS..."); 
     
     kmt->sem_init(&(vfs_sem), "vfs semaphore", 1);
     
     // manually build the root directory and mount the kvfs as the root fs
     syslog("VFS", "Mounting kvfs to root...");
     
-    root_dentry = kvfs->mount(kvfs, "", "");
+    root_dentry = kvfs->mount(kvfs, "ramdisk0", "");
+    
+    if (root_dentry == NULL) {
+        syslog("VFS", "Failed to mount kvfs to root. Root fs failed to build itself.");
+        panic("Root fs failed to mount.");
+    }
     
     root_mnt.mnt_count = 1;
     root_mnt.mnt_devname = "ramdisk0";
@@ -51,7 +59,6 @@ void vfs_init() {
     mnt_head = &root_mnt;
     
     syslog("VFS", "kvfs is mounted.");
-    
     syslog("VFS", "VFS initialization is done.");
 }
 
@@ -127,7 +134,7 @@ int vfs_mount(const char *path, filesystem_t *fs) {
         return -1;
     }
     
-    mount_root = fs->mount(fs, path, "");
+    mount_root = fs->mount(fs, fs->dev, "");
     if (mount_root == NULL) {
         syslog("VFS", "failed to mount %s: mount() failed");
         kmt->sem_signal(&vfs_sem);
@@ -174,10 +181,11 @@ int vfs_unmount(const char *path) {
     }
     
     mntit = mnt_head;
-    while (mntit != NULL && mntit->mnt_root != retden) // pick the corresponding mounted fs
+    while (mntit != NULL && mntit->mnt_root != retden) { // pick the corresponding mounted fs
         mntit = mntit->mnt_next;
+    }
     if (mntit == NULL) {
-        syslog("VFS", "failed to unmount %s: path is not a mountpoint.");
+        syslog("VFS", "failed to unmount %s: path is not a mountpoint.", path);
         kmt->sem_signal(&vfs_sem);
         return 1;
     }
@@ -192,7 +200,8 @@ int vfs_unmount(const char *path) {
             mntremain = mntremain->mnt_next;
         mntremain->mnt_next = mntit->mnt_next;
     }
-    mntit->mnt_fs->sop->umount_begin(mntit->mnt_fs);
+    if (mntit->mnt_fs->sop->umount_begin != NULL)
+        mntit->mnt_fs->sop->umount_begin(mntit->mnt_fs);
     pmm->free(mntit->mnt_fs);
     pmm->free(mntit);
     
@@ -209,7 +218,7 @@ int vfs_open(const char *path, int flags) {
     
     kmt->sem_wait(&vfs_sem);
 
-    retden = make_path_file(path, &nd);
+    retden = make_path(path, 0, &nd, ACL_DEFAULT);
     
     if (retden == NULL) {
         kmt->sem_signal(&vfs_sem);
@@ -244,8 +253,9 @@ int vfs_open(const char *path, int flags) {
 ssize_t vfs_read(int fd, void *buf, size_t nbyte) {
     kmt->sem_wait(&vfs_sem);
     
-    ssize_t readcount;
-    readcount = current->file_descriptors[fd]->f_op->read(current->file_descriptors[fd], buf, nbyte);
+    ssize_t readcount = 0;
+    if (fd != STDIN_FILENO && fd != STDOUT_FILENO && fd != STDERR_FILENO) // we currently don't support stdin
+        readcount = current->file_descriptors[fd]->f_op->read(current->file_descriptors[fd], buf, nbyte);
     
     kmt->sem_signal(&vfs_sem);
     return readcount;
@@ -254,9 +264,16 @@ ssize_t vfs_read(int fd, void *buf, size_t nbyte) {
 ssize_t vfs_write(int fd, void *buf, size_t nbyte) {
     kmt->sem_wait(&vfs_sem);
     
-    ssize_t writecount;
-    
-    writecount = current->file_descriptors[fd]->f_op->write(current->file_descriptors[fd], buf, nbyte);
+    ssize_t writecount = 0;
+    if (fd == STDOUT_FILENO || fd == STDERR_FILENO) {
+        while (nbyte-- != 0) {
+            printf("%c", *(char *)(buf++));
+            writecount++;
+        }
+    }
+    else if (fd != STDIN_FILENO) { // we currently don't support stdin
+        writecount = current->file_descriptors[fd]->f_op->write(current->file_descriptors[fd], buf, nbyte);
+    }
     
     kmt->sem_signal(&vfs_sem);
     return writecount;
@@ -265,18 +282,46 @@ ssize_t vfs_write(int fd, void *buf, size_t nbyte) {
 off_t vfs_lseek(int fd, off_t offset, int whence) {
     kmt->sem_wait(&vfs_sem);
     
-    ssize_t pos;
-    pos = current->file_descriptors[fd]->f_op->llseek(current->file_descriptors[fd], offset, whence);
+    ssize_t pos = 0;
+    if (fd != STDIN_FILENO && fd != STDOUT_FILENO && fd != STDERR_FILENO) // we currently don't support stdin
+        pos = current->file_descriptors[fd]->f_op->llseek(current->file_descriptors[fd], offset, whence);
     
     kmt->sem_signal(&vfs_sem);
     return pos;
 }
 
 int vfs_close(int fd) {
-    if (current->file_descriptors[fd] != NULL) {
-        pmm->free(current->file_descriptors[fd]);
-        current->file_descriptors[fd] = NULL;
-        return 0;
+    if (fd != STDIN_FILENO && fd != STDOUT_FILENO && fd != STDERR_FILENO) { // we currently don't support stdin
+        if (current->file_descriptors[fd] != NULL) {
+            pmm->free(current->file_descriptors[fd]);
+            current->file_descriptors[fd] = NULL;
+            return 0;
+        }
     }
     return -1;
+}
+
+
+int vfs_mkdir(const char *path, unsigned short mode) {
+    kmt->sem_wait(&vfs_sem);
+    
+    struct nameidata nd;
+    struct dentry *retden;
+    
+    retden = path_lookup(path, 0, &nd);
+    
+    if (retden != NULL) { // path exists
+        kmt->sem_signal(&vfs_sem);
+        return -1;
+    }
+    
+    retden = make_path(path, LOOKUP_DIRECTORY, &nd, mode);
+    
+    if (retden == NULL) { // failed to create path
+        kmt->sem_signal(&vfs_sem);
+        return -1;
+    }
+    
+    kmt->sem_signal(&vfs_sem);
+    return 0;
 }
