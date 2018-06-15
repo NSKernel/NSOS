@@ -16,6 +16,7 @@ void launchd(void *x) {
     
     // mount profs
     vfs->mkdir("/proc", 0x0664); // no matter if it exists, we first *try* make the dir
+    syslog("shit", "now mount");
     if (vfs->mount("/proc", procfs)) {
         syslog("launchd", "failed to mount proc");
         panic("Failed to mount proc");

@@ -261,7 +261,11 @@ int do_lookup(struct nameidata *nd, const char *name, int namelen) {
     
     if (nd->dentry->d_inode->i_op->lookup != NULL) { // still got a chance to lookup for a subdir that has not been read yet
         denit = (struct dentry *)(pmm->alloc(sizeof(struct dentry)));
+        if (denit == NULL)
+            return 1;
         denit->d_iname = (char *)(pmm->alloc(sizeof(char) * (namelen + 1)));
+        if (denit->d_iname == NULL)
+            return 1;
         strncpy(denit->d_iname, name, namelen + 1);
         denit->d_iname[namelen] = '\0';
         denit->d_inode = NULL;
@@ -270,14 +274,20 @@ int do_lookup(struct nameidata *nd, const char *name, int namelen) {
         denit->d_subdirs = NULL;
         denit->d_mounted = 0;
         denit->d_op = nd->mnt->mnt_fs->dop;
-        newinode = nd->mnt->mnt_fs->sop->alloc_inode(nd->mnt->mnt_fs);
+        if (nd->mnt->mnt_fs->sop->alloc_inode != NULL) {
+            newinode = nd->mnt->mnt_fs->sop->alloc_inode(nd->mnt->mnt_fs);
         
-        if (nd->dentry->d_inode->i_op->lookup(newinode, denit) != NULL) {
-            denit->d_child = nd->dentry->d_subdirs;
-            nd->dentry->d_subdirs = denit;
-            nd->dentry = denit;
-            return 0;
+            if (newinode != NULL && nd->dentry->d_inode->i_op->lookup(newinode, denit) != NULL) {
+                denit->d_child = nd->dentry->d_subdirs;
+                nd->dentry->d_subdirs = denit;
+                nd->dentry = denit;
+                return 0;
+            }
+            if (newinode != NULL)
+                nd->mnt->mnt_fs->sop->destroy_inode(newinode);
         }
+        pmm->free(denit->d_iname);
+        pmm->free(denit);
     }
     return 1;
 }
