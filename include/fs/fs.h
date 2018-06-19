@@ -69,6 +69,7 @@ struct file {
     struct dentry *f_dentry;
     struct inode *f_inode;
     off_t f_pos;
+    uint32_t f_mode;
     
     uint32_t f_count;
     
@@ -82,5 +83,10 @@ struct file_operations {
     ssize_t (*write)(struct file *fp, char *buf, size_t count);
     //int (*readdir)(struct file *fp, struct dentry *subdirs);
 };
+
+#define O_RDONLY 0x1
+#define O_WRONLY 0x2
+#define O_RDWR   0x3
+#define O_APPEND 0x10
 
 #endif

@@ -229,22 +229,31 @@ ssize_t kvfs_read(struct file *fp, char *buf, size_t count) {
 
 // write is merely just an append operation
 ssize_t kvfs_write(struct file *fp, char *buf, size_t count) {
-    char *newstart = pmm->alloc(fp->f_inode->i_size + count);
-    char *newend = newstart + fp->f_inode->i_size + count;
-    
-    if (kvfs_files[fp->f_inode->i_ino].start != NULL) { // copy the old stuff
-        memcpy(newstart, kvfs_files[fp->f_inode->i_ino].start, fp->f_inode->i_size);
+    char *newstart = kvfs_files[fp->f_inode->i_ino].start;
+    char *newend = kvfs_files[fp->f_inode->i_ino].end;
+    if (fp->f_mode & O_APPEND) {
+        fp->f_pos = fp->f_inode->i_size;
     }
-    memcpy(newstart + fp->f_inode->i_size, buf, count);
-    
-    if (kvfs_files[fp->f_inode->i_ino].start != NULL) {
-        pmm->free(kvfs_files[fp->f_inode->i_ino].start);
+    if (!(fp->f_mode & O_WRONLY)) {
+        return 0;
     }
+    if (fp->f_pos + count > fp->f_inode->i_size) {
+        newstart = pmm->alloc(fp->f_pos + count);
+        newend = newstart + fp->f_pos + count;
+        memset(newstart, 0, fp->f_pos + count);
+        if (kvfs_files[fp->f_inode->i_ino].start != NULL) { // copy the old stuff
+            memcpy(newstart, kvfs_files[fp->f_inode->i_ino].start, fp->f_inode->i_size);
+            pmm->free(kvfs_files[fp->f_inode->i_ino].start);
+        }
+    }
+    
+    memcpy(newstart + fp->f_pos, buf, count);
+    if (fp->f_inode->i_size < fp->f_pos + count)
+        fp->f_inode->i_size = fp->f_pos + count;
     
     kvfs_files[fp->f_inode->i_ino].start = newstart;
     kvfs_files[fp->f_inode->i_ino].end = newend;
-    
-    fp->f_inode->i_size += count;
+    fp->f_pos += count;
     
     return count;
 }

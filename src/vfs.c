@@ -232,6 +232,7 @@ int vfs_open(const char *path, int flags) {
     newfile->f_pos = 0;
     newfile->f_count = 0;
     newfile->f_op = newfile->f_inode->i_fop;
+    newfile->f_mode = flags;
     
     for (i = 0; i < MAX_FILE_PER_THREAD; i++) {
         if (current->file_descriptors[i] == NULL) {

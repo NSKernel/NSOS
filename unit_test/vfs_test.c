@@ -50,7 +50,7 @@ void threadfuncvfswrite(void *n) {
     
     sprintf(testword, "Hello from thread %d\n", n);
     
-    fd = vfs->open("/a/b/c.txt", O_RDWR);
+    fd = vfs->open("/a/b/c.txt", O_RDWR | O_APPEND);
     
     syslog("KMT_TEST", "Thread %d started, opened fd is %d", (int)n, fd);
     tracefile(fd);
@@ -82,6 +82,20 @@ void vfs_test_single_thread_rw() {
     syslog("VFS_TEST", "Writing data \"Hello world!\\nThis is a new file!\\n\"to \"/a.txt\" with fd %d", fd1);
     vfs->write(fd1, testword1, strlen(testword1));
     syslog("VFS_TEST", "Reading out data from \"/a.txt\"");
+    vfs->lseek(fd1, 0, SEEK_SET);
+    readcount = vfs->read(fd1, vfs_test_buf, 150);
+    vfs_test_buf[readcount] = '\0';
+    syslog("VFS_TEST", "%d bytes read. Data is: ", readcount);
+    printf("%s", vfs_test_buf);
+    
+    syslog("VFS_TEST", "Press enter to continue\n");
+    press_enter_to_continue();
+    
+    syslog("VFS_TEST", "Writing data \"Hello world!\\nThis is a new file!\\n\"to \"/a.txt\" with fd %d from offset 1", fd1);
+    vfs->lseek(fd1, 1, SEEK_SET);
+    vfs->write(fd1, testword1, strlen(testword1));
+    syslog("VFS_TEST", "Reading out data from \"/a.txt\"");
+    vfs->lseek(fd1, 0, SEEK_SET);
     readcount = vfs->read(fd1, vfs_test_buf, 150);
     vfs_test_buf[readcount] = '\0';
     syslog("VFS_TEST", "%d bytes read. Data is: ", readcount);
@@ -91,12 +105,13 @@ void vfs_test_single_thread_rw() {
     press_enter_to_continue();
     
     syslog("VFS_TEST", "Creating another file at \"/a/b/c.txt\"");
-    fd2 = vfs->open("/a/b/c.txt", O_RDWR);
+    fd2 = vfs->open("/a/b/c.txt", O_RDWR | O_APPEND);
     syslog("VFS_TEST", "Traced path of the file is");
     tracefile(fd2);
     syslog("VFS_TEST", "Writing data \"Hello world!\\nThis is another new file in rootfs!\\n\"to \"/a/b/c.txt\" with fd %d", fd2);
     vfs->write(fd2, testword2, strlen(testword2));
     syslog("VFS_TEST", "Reading out data from \"/a/b/c.txt\"");
+    vfs->lseek(fd2, 0, SEEK_SET);
     readcount = vfs->read(fd2, vfs_test_buf, 150);
     vfs_test_buf[readcount] = '\0';
     syslog("VFS_TEST", "%d bytes read. Data is: ", readcount);
@@ -109,12 +124,13 @@ void vfs_test_single_thread_rw() {
     vfs->close(fd1);
     
     syslog("VFS_TEST", "Reopening file \"/a.txt\"");
-    fd1 = vfs->open("/a.txt", O_RDWR);
+    fd1 = vfs->open("/a.txt", O_RDWR | O_APPEND);
     syslog("VFS_TEST", "Traced path of the file is");
     tracefile(fd1);
     syslog("VFS_TEST", "Appending data \"Hello world!\\nThis is a new file!\\n\"to \"/a.txt\" to fd %d", fd1);
     vfs->write(fd1, testword1, strlen(testword1));
     syslog("VFS_TEST", "Reading out data from \"/a.txt\"");
+    vfs->lseek(fd1, 0, SEEK_SET);
     readcount = vfs->read(fd1, vfs_test_buf, 150);
     vfs_test_buf[readcount] = '\0';
     syslog("VFS_TEST", "%d bytes read. Data is: ", readcount);
@@ -124,23 +140,24 @@ void vfs_test_single_thread_rw() {
     press_enter_to_continue();
     
     syslog("VFS_TEST", "Opening path \"/a/b\" which shoud fail because b is a dir");
-    fd3 = vfs->open("/a/b", O_RDWR);
+    fd3 = vfs->open("/a/b", O_RDWR | O_APPEND);
     syslog("VFS_TEST", "fd is %d", fd3);
     
     syslog("VFS_TEST", "Also creating file \"/a/b/c.txt/d.txt\" shoud fail because c.txt is a file");
-    fd3 = vfs->open("/a/b/c.txt/d.txt", O_RDWR);
+    fd3 = vfs->open("/a/b/c.txt/d.txt", O_RDWR | O_APPEND);
     syslog("VFS_TEST", "fd is %d", fd3);
     
     syslog("VFS_TEST", "Press enter to continue\n");
     press_enter_to_continue();
     
     syslog("VFS_TEST", "But creating file \"/a/b.txt\" should work");
-    fd3 = vfs->open("/a/b.txt", O_RDWR);
+    fd3 = vfs->open("/a/b.txt", O_RDWR | O_APPEND);
     syslog("VFS_TEST", "Traced path of the file is");
     tracefile(fd3);
     syslog("VFS_TEST", "fd is %d and it did work", fd3);
     syslog("VFS_TEST", "Writing data \"Hello world!\\nThis is a new file!\\n\"to \"/a/b.txt\" to fd %d", fd3);
     vfs->write(fd3, testword1, strlen(testword1));
+    vfs->lseek(fd3, 0, SEEK_SET);
     syslog("VFS_TEST", "Reading out data from \"/a/b.txt\"");
     readcount = vfs->read(fd3, vfs_test_buf, 150);
     vfs_test_buf[readcount] = '\0';
@@ -181,11 +198,12 @@ void vfs_test_mount() {
     press_enter_to_continue();
     
     syslog("VFS_TEST", "Creating file at \"/a/b/c.txt\" in newly mounted fs");
-    fd2 = vfs->open("/a/b/c.txt", O_RDWR);
+    fd2 = vfs->open("/a/b/c.txt", O_RDWR | O_APPEND);
     syslog("VFS_TEST", "Traced path of the file is");
     tracefile(fd2);
     syslog("VFS_TEST", "Writing data \"Hello world!\\nThis is a file in a newly mounted fs!!\\n\"to \"/a/b/c.txt\" with fd %d", fd2);
     vfs->write(fd2, testword3, strlen(testword3));
+    vfs->lseek(fd2, 0, SEEK_SET);
     syslog("VFS_TEST", "Reading out data from \"/a/b/c.txt\"");
     readcount = vfs->read(fd2, vfs_test_buf, 150);
     vfs_test_buf[readcount] = '\0';
@@ -208,7 +226,7 @@ void vfs_test_mount() {
     press_enter_to_continue();
     
     syslog("VFS_TEST", "Reopening \"/a/b/c.txt\" in old fs");
-    fd2 = vfs->open("/a/b/c.txt", O_RDWR);
+    fd2 = vfs->open("/a/b/c.txt", O_RDWR | O_APPEND);
     syslog("VFS_TEST", "Traced path of the file is");
     tracefile(fd2);
     syslog("VFS_TEST", "Reading out data from \"/a/b/c.txt\" and we should still get the old test words");
